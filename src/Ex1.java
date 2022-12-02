@@ -1,3 +1,5 @@
+import com.sun.xml.internal.txw2.Document;
+
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.util.Scanner; // Import the Scanner class to read text files
@@ -8,8 +10,6 @@ public class Ex1 {
 
 
     public static void main(String[] args) {
-
-
 
         /**
          * 1. read the input
@@ -24,19 +24,23 @@ public class Ex1 {
          */
 
         int line_counter = 0;
+        Document document;
 
         // Read the given input file
         try {
             File file = new File(input);
             Scanner myReader = new Scanner(file);
-            while (myReader.hasNextLine()){
+            while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
 
-
                 // open the xml file
-                if(line_counter == 0 ){
+                if (line_counter == 0) {
                     System.out.println(line);
-                  XmlReader xml = new XmlReader(line);
+
+                    //Instantiate XML file
+                    XmlReader xml = new XmlReader(line);
+                    xml.getAllTag(xml.getDocument());
+
                 }
                 line_counter++;
             }

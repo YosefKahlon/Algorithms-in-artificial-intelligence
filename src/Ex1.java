@@ -2,6 +2,8 @@ import com.sun.xml.internal.txw2.Document;
 
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner; // Import the Scanner class to read text files
 
 public class Ex1 {
@@ -14,7 +16,7 @@ public class Ex1 {
         /**
          * 1. read the input
          *  1.2. open the xml from the first line
-         *  1.3. build the variable
+         *  1.3. build the variable --> [ need to fix cpt]
          *  1.4 get the queries and algorithm
          * 2. build the network
          * 3. make the query
@@ -25,6 +27,9 @@ public class Ex1 {
 
         int line_counter = 0;
         Document document;
+        XmlReader xml = null;
+        Queue<String> queries= new LinkedList<>();
+
 
         // Read the given input file
         try {
@@ -34,14 +39,22 @@ public class Ex1 {
                 String line = myReader.nextLine();
 
                 // open the xml file
+                // the first line in the xml
                 if (line_counter == 0) {
                     System.out.println(line);
 
                     //Instantiate XML file
-                    XmlReader xml = new XmlReader(line);
-                    xml.getAllTag(xml.getDocument());
-
+                    xml = new XmlReader(line);
                 }
+                // get the queries and algorithm
+                else {
+
+                    //todo
+                    // maybe add to queue
+                    queries.add(line);
+                }
+
+
                 line_counter++;
             }
             myReader.close();
@@ -52,7 +65,13 @@ public class Ex1 {
         }
 
 
+        System.out.println(queries);
+
+        //Todo
+        Network bayesian = new Network();
+        assert xml != null;
+        bayesian = new Network(xml.getNetworkStructure(xml.getDocument()));
+
+
     }
-
-
 }

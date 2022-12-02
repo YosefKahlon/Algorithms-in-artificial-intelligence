@@ -36,7 +36,7 @@ public class XmlReader {
 
     }
 
-    public void getAllTag(Document doc) {
+    public HashMap<String,variable> getNetworkStructure(Document doc) {
 
 
         HashMap<String, variable> varMap = new HashMap<>();
@@ -129,14 +129,14 @@ public class XmlReader {
                     }
 
                 }
-
-
             }
         }
 
 //        varMap.forEach((key, value) -> {
 //            System.out.println(key + "\n" + value.getParents() + " \n cpt" + value.getCpt() + "\n==========\n");
 //        });
+
+        return varMap;
     }
 
 

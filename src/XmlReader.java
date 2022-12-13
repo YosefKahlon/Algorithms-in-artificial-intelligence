@@ -1,5 +1,5 @@
+
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public class XmlReader {
 
@@ -36,55 +35,61 @@ public class XmlReader {
 
     }
 
-    public HashMap<String,variable> getNetworkStructure(Document doc) {
+
+    public List<Variable> getVar(Document doc) {
 
 
-        HashMap<String, variable> varMap = new HashMap<>();
+        HashMap<String, Variable> varMap = new HashMap<>();
+//        List<Variable> variableList = new ArrayList<>();
 
         // Read the tag VARIABLE from the xml
-        NodeList variableList = doc.getElementsByTagName("VARIABLE");
+        NodeList varList = doc.getElementsByTagName("VARIABLE");
 
 
-        for (int i = 0; i < variableList.getLength(); i++) {
-            Node variableNode = variableList.item(i);
-            String name = "";
+        //run on VARIABLE tag
+        for (int i = 0; i < varList.getLength(); i++) {
+            Node variableNode = varList.item(i);
+            String name= "";
             List<String> outcome = new ArrayList<>();
 
-            if (variableNode.getNodeType() == Node.ELEMENT_NODE) {
+            // has sub-elements
+            if (variableNode.getNodeType() == Node.ELEMENT_NODE){
                 NodeList childNodes = variableNode.getChildNodes();
-
 
                 for (int j = 0; j < childNodes.getLength(); j++) {
                     Node childNode = childNodes.item(j);
 
-
-                    if (childNode.getNodeName().equals("NAME")) {
-
+                    //get the name of the variable
+                    if (childNode.getNodeName().equals("NAME")){
                         name = childNode.getTextContent();
 
-                    } else if (childNode.getNodeName().equals("OUTCOME")) {
+                        //get the outcome of the variable
+                    }else if(childNode.getNodeName().equals("OUTCOME")){
                         NodeList outcomeNode = childNode.getChildNodes();
                         for (int k = 0; k < outcomeNode.getLength(); k++) {
-
                             outcome.add(outcomeNode.item(k).getTextContent());
                         }
-
                     }
 
-                }
-                variable v = new variable(name);
-                v.setOutcome(outcome);
-                varMap.put(name, v);
 
+
+                }
+                Variable v = new Variable(name);
+                v.setVar_outcome(outcome);
+                varMap.put(name, v);
             }
+
+
+
         }
 
 
+        //run on DEFINITION tag
         NodeList definitionList = doc.getElementsByTagName("DEFINITION");
         for (int i = 0; i < definitionList.getLength(); i++) {
             Node definitionNode = definitionList.item(i);
 
-
+            // has sub-elements
             if (definitionNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList childNodes = definitionNode.getChildNodes();
                 String name = "";
@@ -92,21 +97,27 @@ public class XmlReader {
                     Node childNode = childNodes.item(j);
 
                     switch (childNode.getNodeName()) {
+
+                        // which variable is it
                         case "FOR":
-
                             name = childNode.getTextContent();
-
                             break;
-                        case "GIVEN":
-                            NodeList outcomeNode = childNode.getChildNodes();
-                            for (int k = 0; k < outcomeNode.getLength(); k++) {
 
+                        // the parents of the variable
+                        case "GIVEN":
+                            NodeList varParents = childNode.getChildNodes();
+                            for (int k = 0; k < varParents.getLength(); k++) {
                                 //add parents
-                                varMap.get(name).getParents().add(varMap.get(outcomeNode.item(k).getTextContent()));
+
+                                varMap.get(name).getVar_parents().add(
+                                        varMap.get(varParents.item(k).getTextContent())
+                                );
+
+//                                varMap.get(name).getVar_parents().add(
+//                                        varMap.get(varParents.item(k).getTextContent()).toString());
 
                                 //add child
-                                varMap.get(outcomeNode.item(k).getTextContent()).getChild().add(varMap.get(name));
-
+                                varMap.get(varParents.item(k).getTextContent()).getVar_children().add(varMap.get(name).toString());
                             }
 
                             break;
@@ -116,13 +127,14 @@ public class XmlReader {
                             NodeList cpt_value = childNode.getChildNodes();
                             String s1 = cpt_value.item(0).getTextContent();
 
+
                             //split string
                             List<String> temp_list = new ArrayList<String>(Arrays.asList(s1.split(" ")));
 
                             //get the value
                             for (String s : temp_list) {
                                 double val = new Double(s);
-                                varMap.get(name).getCpt().add(val);
+                                varMap.get(name).getVar_cpt().add(val);
                             }
 
                             break;
@@ -132,14 +144,14 @@ public class XmlReader {
             }
         }
 
-//        varMap.forEach((key, value) -> {
-//            System.out.println(key + "\n" + value.getParents() + " \n cpt" + value.getCpt() + "\n==========\n");
-//        });
+        varMap.forEach((key,value)->{
+            varMap.get(key).CreateCPT();
+        });
 
-        return varMap;
+
+        return new ArrayList<Variable>(varMap.values());
     }
-
-
+    
     public Document getDocument() {
         return this.document;
     }

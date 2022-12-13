@@ -1,10 +1,11 @@
 import com.sun.xml.internal.txw2.Document;
 
+
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class Ex1 {
 
@@ -16,20 +17,18 @@ public class Ex1 {
         /**
          * 1. read the input
          *  1.2. open the xml from the first line
-         *  1.3. build the variable --> [ need to fix cpt]
+         *  1.3. build the old.variable --> [ need to fix cpt]
          *  1.4 get the queries and algorithm
          * 2. build the network
          * 3. make the query
          *  3.1. add to output the result
-         *
-         *
          */
 
         int line_counter = 0;
         Document document;
         XmlReader xml = null;
-        Queue<String> queries= new LinkedList<>();
-
+        Queue<String> queries = new LinkedList<>();
+        List<Variable> variableList = new ArrayList<>();
 
         // Read the given input file
         try {
@@ -45,15 +44,13 @@ public class Ex1 {
 
                     //Instantiate XML file
                     xml = new XmlReader(line);
+                    variableList = xml.getVar(xml.getDocument());
+
                 }
                 // get the queries and algorithm
-                else {
-
-                    //todo
-                    // maybe add to queue
+                else if (!line.isEmpty()) {
                     queries.add(line);
                 }
-
 
                 line_counter++;
             }
@@ -65,13 +62,37 @@ public class Ex1 {
         }
 
 
-        System.out.println(queries);
+        Network bayesian = new Network(variableList);
+        //bayesian.printNetwork();
 
-        //Todo
-        Network bayesian = new Network();
-        assert xml != null;
-        bayesian = new Network(xml.getNetworkStructure(xml.getDocument()));
 
+        try {
+            FileWriter myWriter = new FileWriter("filename.txt");
+            while (!queries.isEmpty()) {
+                //System.out.println(queries.peek());
+                String[] s1 = queries.poll().split("\\)");
+                String[] algo_num = s1[1].split(",");
+                String[] p_queries = s1[0].split("\\(");
+                System.out.println(p_queries[1]);
+
+
+                switch (algo_num[1]) {
+                    case ("1"):
+                        String ans = bayesian.simpleDeduction(p_queries[1]);
+                        myWriter.write(ans);
+                        System.out.println(ans);
+                        break;
+                    case ("2"):
+                        break;
+                    case ("3"):
+                        break;
+                }
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
 
     }
 }

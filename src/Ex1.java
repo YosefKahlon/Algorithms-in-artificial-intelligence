@@ -17,7 +17,7 @@ public class Ex1 {
         /**
          * 1. read the input
          *  1.2. open the xml from the first line
-         *  1.3. build the old.variable --> [ need to fix cpt]
+         *  1.3. build the variable
          *  1.4 get the queries and algorithm
          * 2. build the network
          * 3. make the query
@@ -63,11 +63,12 @@ public class Ex1 {
 
 
         Network bayesian = new Network(variableList);
-        //bayesian.printNetwork();
+      //  bayesian.printNetwork();
 
 
         try {
             FileWriter myWriter = new FileWriter("filename.txt");
+
             while (!queries.isEmpty()) {
                 //System.out.println(queries.peek());
                 String[] s1 = queries.poll().split("\\)");
@@ -78,15 +79,18 @@ public class Ex1 {
 
                 switch (algo_num[1]) {
                     case ("1"):
-                        String ans = bayesian.simpleDeduction(p_queries[1]);
-                        myWriter.write(ans);
-                        System.out.println(ans);
+
+                        myWriter.write(bayesian.simpleDeduction(p_queries[1]));
+                       // System.out.println(bayesian.simpleDeduction(p_queries[1]);
                         break;
                     case ("2"):
+                        String ans = bayesian.VariableElimination(p_queries[1]);
+                        System.out.println(ans);
                         break;
                     case ("3"):
                         break;
                 }
+                break;
             }
             myWriter.close();
         } catch (IOException e) {

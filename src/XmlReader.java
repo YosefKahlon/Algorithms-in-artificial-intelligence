@@ -151,7 +151,7 @@ public class XmlReader {
 
         return new ArrayList<Variable>(varMap.values());
     }
-    
+
     public Document getDocument() {
         return this.document;
     }

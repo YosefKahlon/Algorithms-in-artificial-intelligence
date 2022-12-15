@@ -155,60 +155,71 @@ public class Variable {
         //System.out.println("----------------------------");
         //System.out.println(this.name);
         Map<List<String>, Double> ans = new HashMap<>();
-       // System.out.println(this.cptMap);
+        // System.out.println(this.cptMap);
 
         Set<List<String>> set = this.cptMap.keySet();
         List<List<String>> parents_outcome = new ArrayList<>(set);
         List<String> event_outcome = new ArrayList<>();
+        boolean flag = true;
 
         for (int i = 0; i < parents_outcome.size(); i++) {
-           // System.out.println(parents_outcome.get(i));
+             System.out.println(parents_outcome.get(i));
 
-            event_outcome.clear();
-            //-------------------------------------
-
-            if (parents_outcome.get(i)!= null) {
-                event_outcome.addAll(parents_outcome.get(i));
+            flag = true;
+            for (int j = 0; j < evidence.size(); j++) {
+                if (this.getParentsName().contains(evidence.get(j))
+                        && !parents_outcome.get(i).get(this.getParentsName().indexOf(evidence.get(j))).equals(evidence_outcome.get(j))) {
+                    flag = false;
+                }
             }
 
-            // variable is one of the evidence
-            // use only his outcome from the query
-            // with his parent outcome value
-            if (evidence.contains(this.name)) {
-                event_outcome.add(evidence_outcome.get(evidence.indexOf(name)));
-                List<String> key = new ArrayList<>(event_outcome);
-                ans.put(key,this.cptMap.get(parents_outcome.get(i)).get(evidence_outcome.get(evidence.indexOf(name))));
-                //System.out.println(ans);
-            }
-            //----------------------------------------
+            if (flag) {
+                event_outcome.clear();
+                //-------------------------------------
 
-            //get all outcomes of variable
-            else {
-                int size = event_outcome.size();
-                for (int j = 0; j < this.var_outcome.size(); j++) {
+                if (parents_outcome.get(i) != null) {
+                    event_outcome.addAll(parents_outcome.get(i));
+                }
 
-                    if (size < event_outcome.size()) {
-                        event_outcome.remove(size);
-                    }
-                    event_outcome.add(this.var_outcome.get(j));
+                // variable is one of the evidence
+                // use only his outcome from the query
+                // with his parent outcome value
+                if (evidence.contains(this.name)) {
+                    event_outcome.add(evidence_outcome.get(evidence.indexOf(name)));
                     List<String> key = new ArrayList<>(event_outcome);
-                    ans.put(key, this.cptMap.get(parents_outcome.get(i)).get(this.var_outcome.get(j)));
-                    //  System.out.println(ans);
+                    ans.put(key, this.cptMap.get(parents_outcome.get(i)).get(evidence_outcome.get(evidence.indexOf(name))));
+                    //System.out.println(ans);
+                }
+                //----------------------------------------
+
+                //get all outcomes of variable
+                else {
+                    int size = event_outcome.size();
+                    for (int j = 0; j < this.var_outcome.size(); j++) {
+
+                        if (size < event_outcome.size()) {
+                            event_outcome.remove(size);
+                        }
+                        event_outcome.add(this.var_outcome.get(j));
+                        List<String> key = new ArrayList<>(event_outcome);
+                        ans.put(key, this.cptMap.get(parents_outcome.get(i)).get(this.var_outcome.get(j)));
+                        //  System.out.println(ans);
+                    }
                 }
             }
         }
 
         return ans;
+
+
+
     }
-
-
 
 
     public Iterator<List<String>> parentsValsIter() {
         //	System.out.println(events_prob.keySet());
         return this.cptMap.keySet().iterator();
     }
-
 
 
     public Map<List<String>, Double> getEventsWith(Map<String, String> evidence) {
@@ -250,8 +261,7 @@ public class Variable {
                     events_with_prob.put(new ArrayList<String>(event_vals),
                             this.cptMap.get(event).get(evidence.get(name)));
                     //System.out.println(events_with_prob);
-                }
-                else {
+                } else {
                     // event val size = 0
                     int event_vals_size = event_vals.size();
                     //	System.out.println(event_vals);

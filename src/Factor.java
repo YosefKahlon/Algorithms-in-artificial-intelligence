@@ -42,6 +42,8 @@ public class Factor {
         return factor.get(this.varOfTheFactor).size();
     }
 
+
+
     public Factor join(Factor factor) {
 
         Factor result = new Factor();
@@ -117,7 +119,7 @@ public class Factor {
             }
 
         }
-        result.setParamter(resultFactorVar, probability);
+        result.setParameter(resultFactorVar, probability);
         //result.factor.put(resultFactorVar, probability);
         add_Multi(multi_counter);
         add_Multi(factor.getMulti_counter());
@@ -131,7 +133,7 @@ public class Factor {
     }
 
 
-    private void setParamter(List<String> resultFactorVar, Map<List<String>, Double> probability) {
+    private void setParameter(List<String> resultFactorVar, Map<List<String>, Double> probability) {
         this.factor.put(resultFactorVar, probability);
         this.varOfTheFactor = resultFactorVar;
     }
@@ -192,7 +194,7 @@ public class Factor {
 
         System.out.println("plus "+ plus_counter);
         this.varOfTheFactor.remove(hidden_var);
-        setParamter(this.varOfTheFactor, probability);
+        setParameter(this.varOfTheFactor, probability);
 
     }
 

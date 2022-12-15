@@ -532,9 +532,13 @@ public class Network {
                 var = this.bayesian.get(var_name);
                 num_line *= var.getVar_outcome().size();
             }
-//            System.out.println(factor_a.getSize());
-//            System.out.println(factor_b.getSize());
+            System.out.println(factor_a.getSize());
+            System.out.println(factor_b.getSize());
+            System.out.println(factor_a);
+            System.out.println(factor_b);
             num_line = num_line - Math.max(factor_a.getSize(),factor_b.getSize());
+
+
             if (num_line<min_num_line){
                 min_num_line =num_line;}
 
@@ -572,6 +576,9 @@ public class Network {
         }
 
     }
+
+
+
 
     private List<String> findDiffVars(List<String> vars_name_a, List<String> vars_name_b, List<String> query_vars) {
         List<String> diff_vars = new ArrayList<String>();

@@ -79,18 +79,18 @@ public class Ex1 {
 
                 switch (algo_num[1]) {
                     case ("1"):
-
                         myWriter.write(bayesian.simpleDeduction(p_queries[1]));
                        // System.out.println(bayesian.simpleDeduction(p_queries[1]);
                         break;
                     case ("2"):
-                        String ans = bayesian.VariableElimination(p_queries[1]);
-                        System.out.println(ans);
+                        myWriter.write( bayesian.VariableElimination(p_queries[1]));
+                       // System.out.println(bayesian.VariableElimination(p_queries[1]));
                         break;
                     case ("3"):
                         break;
                 }
-                break;
+
+
             }
             myWriter.close();
         } catch (IOException e) {

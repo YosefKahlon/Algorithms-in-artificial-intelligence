@@ -156,13 +156,13 @@ public class Factor {
 
     public void elimination(String hidden_var) {
 
-        System.out.println(this.factor);
+       // System.out.println(this.factor);
         Set<List<String>> set = this.factor.keySet();
         List<List<String>> first_list = new ArrayList<>(set);
         // System.out.println(first_list);
         Set<List<String>> set1 = this.factor.get(first_list.get(0)).keySet();
         List<List<String>> outcome_this_factor = new ArrayList<>(set1);
-        System.out.println(outcome_this_factor);
+       // System.out.println(outcome_this_factor);
 
         int plus_counter = 0;
         Map<List<String>, Double> probability = new HashMap<>();
@@ -187,12 +187,12 @@ public class Factor {
 
 
         this.add_Plus(plus_counter);
-        System.out.println("elimination");
+      //  System.out.println("elimination");
 //        result.add_Plus(getPlus_counter());
 //        result.add_Multi(getMulti_counter());
 
 
-        System.out.println("plus "+ plus_counter);
+      //  System.out.println("plus "+ plus_counter);
         this.varOfTheFactor.remove(hidden_var);
         setParameter(this.varOfTheFactor, probability);
 

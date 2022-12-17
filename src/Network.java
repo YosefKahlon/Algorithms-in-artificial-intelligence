@@ -59,9 +59,9 @@ public class Network {
             // System.out.println("hidden outcome " + hidden_outcome);
 
             //get all the sequence of the outcome of the hidden variable
-            hidden_outcome = generateAllSequences(hidden_outcome);
+            //hidden_outcome = generateAllSequences(hidden_outcome);
+            hidden_outcome = getAllCombinations(hidden_outcome);
 //            System.out.println("all outcome of the hidden " + hidden_outcome);
-
 
             all_var.clear();
             all_var.addAll(queryParameter.get(0));
@@ -73,7 +73,7 @@ public class Network {
             int plus_counter = 0;
             int multi_counter = 0;
 
-            double sumOfOuterQuery, sumOfInnerQuery, sumUpper = 0, sumAllQuery = 0;
+            double sumOfOuterQuery, sumOfInnerQuery = 0, sumUpper = 0, sumAllQuery = 0;
             boolean startInnerQuery, startOuterQuery, upper_part = true;
 
 
@@ -118,7 +118,7 @@ public class Network {
                                     all_outcome);
                             multi_counter++;
                         }
-
+                       // System.out.println("--- " + sumOfInnerQuery+ " --------------");
                     }
 
                     if (startOuterQuery) {
@@ -155,6 +155,42 @@ public class Network {
         }
 
     }
+
+
+
+    public static List<List<String>> getAllCombinations(List<List<String>> lists) {
+        List<List<String>> combinations = new ArrayList<>();
+        int[] indices = new int[lists.size()];
+        boolean done = false;
+        while (!done) {
+            List<String> combination = new ArrayList<>();
+            for (int i = 0; i < lists.size(); i++) {
+                combination.add(lists.get(i).get(indices[i]));
+            }
+            combinations.add(combination);
+
+            // Update indices
+            for (int i = lists.size() - 1; i >= 0; i--) {
+                indices[i]++;
+                if (indices[i] >= lists.get(i).size()) {
+                    indices[i] = 0;
+                } else {
+                    break;
+                }
+            }
+            done = true;
+            for (int index : indices) {
+                if (index != 0) {
+                    done = false;
+                    break;
+                }
+            }
+        }
+        return combinations;
+    }
+
+
+
 
     /**
      * Truth table:
@@ -194,6 +230,38 @@ public class Network {
         }
 
         return combinations;
+//        List<List<String>> sequences = new ArrayList<>();
+//        if (inputLists.isEmpty()) {
+//            return sequences;
+//        }
+//
+//        List<String> firstList = inputLists.get(0);
+//        for (String value : firstList) {
+//            List<String> sequence = new ArrayList<>();
+//            sequence.add(value);
+//            sequences.add(sequence);
+//        }
+//
+//        for (int i = 1; i < inputLists.size(); i++) {
+//            List<String> list = inputLists.get(i);
+//            List<List<String>> newSequences = new ArrayList<>();
+//            for (List<String> sequence : sequences) {
+//                if (list.size() > sequence.size()) {
+//                    for (String value : list) {
+//                        List<String> newSequence = new ArrayList<>(sequence);
+//                        newSequence.add(value);
+//                        newSequences.add(newSequence);
+//                    }
+//                } else {
+//                    // Add the remaining values to the end of the sequence
+//                    sequence.addAll(list);
+//                    newSequences.add(sequence);
+//                }
+//            }
+//            sequences = newSequences;
+//        }
+//        System.out.println("sequences: "+sequences);
+//      //  return sequences;
 
     }
 
@@ -374,7 +442,7 @@ public class Network {
             }
         }
 
-        System.out.println(factors);
+     //   System.out.println(factors);
 
         List<Integer> index_join = new ArrayList<>();
         List<String> query_var_to_Join = new ArrayList<>(); //todo delete
@@ -428,7 +496,7 @@ public class Network {
 
             }
 
-        System.out.println("--------------"+ factors.get(0).getMulti_counter());
+   //     System.out.println("--------------"+ factors.get(0).getMulti_counter());
             int sum_x=0,sum_plus=0;
             sum_x += factors.get(0).getMulti_counter();
             sum_plus += factors.get(0).getPlus_counter();
@@ -532,10 +600,10 @@ public class Network {
                 var = this.bayesian.get(var_name);
                 num_line *= var.getVar_outcome().size();
             }
-            System.out.println(factor_a.getSize());
-            System.out.println(factor_b.getSize());
-            System.out.println(factor_a);
-            System.out.println(factor_b);
+//            System.out.println(factor_a.getSize());
+//            System.out.println(factor_b.getSize());
+//            System.out.println(factor_a);
+//            System.out.println(factor_b);
             num_line = num_line - Math.max(factor_a.getSize(),factor_b.getSize());
 
 

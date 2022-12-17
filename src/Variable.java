@@ -27,8 +27,12 @@ public class Variable {
     //       key: outcome of the variable
     //       value: double value of the query
     public void CreateCPT() {
-//        System.out.println(var_cpt);
-
+//        System.out.println("------------------------------------");
+//
+//
+//            System.out.println(this.name);
+//            System.out.println(var_cpt);
+//        System.out.println(var_cpt.size());
 
         // this root node
         if (this.var_parents.isEmpty()) {
@@ -47,8 +51,9 @@ public class Variable {
             }
 
             //get all the possible Sequences of the parents' outcome value
-            List<List<String>> Sequences = new ArrayList<>(generateAllSequences(all_outcome));
-
+            //List<List<String>> Sequences = new ArrayList<>(generateAllSequences(all_outcome));
+            List<List<String>> Sequences = new ArrayList<>(getAllCombinations(all_outcome));
+          //  System.out.println(Sequences.size());
 
             // map  all the value of the variable outcome
             List<Map<String, Double>> store = new ArrayList<>();
@@ -68,43 +73,109 @@ public class Variable {
 
 
         }
-        //System.out.println(this.cptMap);
+      //  System.out.println(this.cptMap);
+    }
+
+    public static List<List<String>> getAllCombinations(List<List<String>> lists) {
+        List<List<String>> combinations = new ArrayList<>();
+        int[] indices = new int[lists.size()];
+        boolean done = false;
+        while (!done) {
+            List<String> combination = new ArrayList<>();
+            for (int i = 0; i < lists.size(); i++) {
+                combination.add(lists.get(i).get(indices[i]));
+            }
+            combinations.add(combination);
+
+            // Update indices
+            for (int i = lists.size() - 1; i >= 0; i--) {
+                indices[i]++;
+                if (indices[i] >= lists.get(i).size()) {
+                    indices[i] = 0;
+                } else {
+                    break;
+                }
+            }
+            done = true;
+            for (int index : indices) {
+                if (index != 0) {
+                    done = false;
+                    break;
+                }
+            }
+        }
+        return combinations;
     }
 
 
+
     public static List<List<String>> generateAllSequences(List<List<String>> lists) {
-        List<List<String>> sequences = new ArrayList<>();
-        if (lists.isEmpty()) {
-            return sequences;
-        }
+//        List<List<String>> sequences = new ArrayList<>();
+//        if (lists.isEmpty()) {
+//            return sequences;
+//        }
+//
+//        List<String> firstList = lists.get(0);
+//        for (String value : firstList) {
+//            List<String> sequence = new ArrayList<>();
+//            sequence.add(value);
+//            sequences.add(sequence);
+//        }
+//
+//        for (int i = 1; i < lists.size(); i++) {
+//            List<String> list = lists.get(i);
+//            List<List<String>> newSequences = new ArrayList<>();
+//            for (List<String> sequence : sequences) {
+//                if (list.size() > sequence.size()) {
+//                    for (String value : list) {
+//                        List<String> newSequence = new ArrayList<>(sequence);
+//                        newSequence.add(value);
+//                        newSequences.add(newSequence);
+//                    }
+//                } else {
+//                    // Add the remaining values to the end of the sequence
+//                    sequence.addAll(list);
+//                    newSequences.add(sequence);
+//                }
+//            }
+//            sequences = newSequences;
+//        }
+//        System.out.println("sequences: "+sequences);
+//       return sequences;
 
-        List<String> firstList = lists.get(0);
-        for (String value : firstList) {
-            List<String> sequence = new ArrayList<>();
-            sequence.add(value);
-            sequences.add(sequence);
-        }
+        List<List<String>> combinations = new ArrayList<>();
 
-        for (int i = 1; i < lists.size(); i++) {
-            List<String> list = lists.get(i);
-            List<List<String>> newSequences = new ArrayList<>();
-            for (List<String> sequence : sequences) {
-                if (list.size() > sequence.size()) {
-                    for (String value : list) {
-                        List<String> newSequence = new ArrayList<>(sequence);
-                        newSequence.add(value);
-                        newSequences.add(newSequence);
-                    }
+        // outer loop: iterate through each list in the input
+        for (List<String> list : lists) {
+            // initialize a new list of combinations for the current list
+            List<List<String>> newCombinations = new ArrayList<>();
+
+            // inner loop: iterate through each element in the current list
+            for (String element : list) {
+                // if this is the first list, add each element as a new combination
+                if (combinations.isEmpty()) {
+                    newCombinations.add(Collections.singletonList(element));
+
                 } else {
-                    // Add the remaining values to the end of the sequence
-                    sequence.addAll(list);
-                    newSequences.add(sequence);
+                    // otherwise, add each element to each existing combination
+                    for (List<String> combination : combinations) {
+                        List<String> newCombination = new ArrayList<>(combination);
+                        newCombination.add(element);
+
+                        newCombinations.add(newCombination);
+
+                    }
                 }
             }
-            sequences = newSequences;
+
+            // replace the existing combinations with the new combinations
+            combinations = newCombinations;
+            // System.out.println(combinations);
         }
 
-        return sequences;
+      //  System.out.println("combinations: "+combinations);
+        return combinations;
+   //    return sequences;
     }
 
     public String getName() {
@@ -163,7 +234,7 @@ public class Variable {
         boolean flag = true;
 
         for (int i = 0; i < parents_outcome.size(); i++) {
-             System.out.println(parents_outcome.get(i));
+           //  System.out.println(parents_outcome.get(i));
 
             flag = true;
             for (int j = 0; j < evidence.size(); j++) {
@@ -216,75 +287,7 @@ public class Variable {
     }
 
 
-    public Iterator<List<String>> parentsValsIter() {
-        //	System.out.println(events_prob.keySet());
-        return this.cptMap.keySet().iterator();
-    }
 
 
-    public Map<List<String>, Double> getEventsWith(Map<String, String> evidence) {
-//		System.out.println(this.name);
-//		System.out.println(evidence);
 
-        Map<List<String>, Double> events_with_prob = new HashMap<List<String>, Double>();
-        List<String> event;
-        Iterator<List<String>> iter = parentsValsIter();
-//		System.out.println(iter.next());
-        boolean toAdd = true;
-        ArrayList<String> event_vals = new ArrayList<String>();
-
-
-        //run on [null] -> {t=0.1, f=0.9}
-        while (iter.hasNext()) {
-            event = iter.next();
-            //System.out.println("event " + event);
-            toAdd = true;
-
-            // if evidence is child of the variable
-            // {j, m}
-            for (String var_name : evidence.keySet()) {
-                if (this.getParentsName().contains(var_name) && !event.get(this.getParentsName().indexOf(var_name)).equals(evidence.get(var_name)))
-                    toAdd = false;
-            }
-            // add
-            if (toAdd) {
-                event_vals.clear();
-
-                //add the value
-                if (event != null)
-                    event_vals.addAll(event);
-                //  the variable is one of the evidence
-                if (evidence.containsKey(name)) {
-//					System.out.println(event_vals);
-                    event_vals.add(evidence.get(name));
-                    //System.out.println(event_vals);
-                    events_with_prob.put(new ArrayList<String>(event_vals),
-                            this.cptMap.get(event).get(evidence.get(name)));
-                    //System.out.println(events_with_prob);
-                } else {
-                    // event val size = 0
-                    int event_vals_size = event_vals.size();
-                    //	System.out.println(event_vals);
-                    // run on the outcome list { t ,f }
-                    for (String value : this.var_outcome) {
-                        // 0 < 0
-                        if (event_vals_size < event_vals.size()) {
-                            event_vals.remove(event_vals_size);
-                            //System.out.println(event_vals);
-                        }
-                        event_vals.add(value);
-                        //System.out.println(event_vals);
-                        //	System.out.println(events_prob.get(event).get(value));
-                        events_with_prob.put(new ArrayList<String>(event_vals), this.cptMap.get(event).get(value));
-                        //	System.out.println(events_with_prob);
-                    }
-                }
-            }
-        }
-//		System.out.println("===== ");
-//		System.out.println(this.name);
-//		System.out.println(this.events_prob);
-//		System.out.println(events_with_prob + " \n ===== "  );
-        return events_with_prob;
-    }
 }

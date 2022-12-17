@@ -63,7 +63,7 @@ public class Ex1 {
 
 
         Network bayesian = new Network(variableList);
-      //  bayesian.printNetwork();
+        //bayesian.printNetwork();
 
 
         try {
@@ -74,13 +74,13 @@ public class Ex1 {
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");
-                System.out.println(p_queries[1]);
+              //  System.out.println(p_queries[1]);
 
 
                 switch (algo_num[1]) {
                     case ("1"):
+                       // System.out.println(bayesian.simpleDeduction(p_queries[1]));
                         myWriter.write(bayesian.simpleDeduction(p_queries[1]));
-                       // System.out.println(bayesian.simpleDeduction(p_queries[1]);
                         break;
                     case ("2"):
                         myWriter.write( bayesian.VariableElimination(p_queries[1]));
@@ -89,7 +89,7 @@ public class Ex1 {
                     case ("3"):
                         break;
                 }
-
+//break;
 
             }
             myWriter.close();

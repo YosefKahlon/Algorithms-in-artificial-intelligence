@@ -10,7 +10,7 @@ import java.util.*;
 public class Ex1 {
 
     private static String input = "input.txt";
-
+    private static String output = "filename.txt";
 
     public static void main(String[] args) {
 
@@ -25,7 +25,6 @@ public class Ex1 {
          */
 
         int line_counter = 0;
-        Document document;
         XmlReader xml = null;
         Queue<String> queries = new LinkedList<>();
         List<Variable> variableList = new ArrayList<>();
@@ -40,14 +39,13 @@ public class Ex1 {
                 // open the xml file
                 // the first line in the xml
                 if (line_counter == 0) {
-                    System.out.println(line);
 
                     //Instantiate XML file
                     xml = new XmlReader(line);
                     variableList = xml.getVar(xml.getDocument());
 
                 }
-                // get the queries and algorithm
+                // get the queries and algorithms
                 else if (!line.isEmpty()) {
                     queries.add(line);
                 }
@@ -63,11 +61,14 @@ public class Ex1 {
 
 
         Network bayesian = new Network(variableList);
-        //bayesian.printNetwork();
+
+        //print the network
+        bayesian.printNetwork();
 
 
+        //write to the output file the result
         try {
-            FileWriter myWriter = new FileWriter("filename.txt");
+            FileWriter myWriter = new FileWriter(output);
 
             while (!queries.isEmpty()) {
                 //System.out.println(queries.peek());
@@ -89,7 +90,7 @@ public class Ex1 {
                     case ("3"):
                         break;
                 }
-//break;
+
 
             }
             myWriter.close();

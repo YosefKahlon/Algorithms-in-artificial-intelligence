@@ -25,7 +25,7 @@ public class Factor {
         this.varOfTheFactor.add(var.getName());
 
         //todo
-        this.factor.put(this.varOfTheFactor, var.getCptLine(evidence, evidence_outcome));
+        this.factor.put(this.varOfTheFactor, var.getCptLines(evidence, evidence_outcome));
         //System.out.println(this.factor);
     }
 

@@ -3,9 +3,11 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class Network {
-
-    Map<String, Variable> bayesian;
-    List<Variable> variableList;
+    /**
+     * This class represents the Bayesian network and the required algorithms.
+     */
+    private Map<String, Variable> bayesian;
+    private List<Variable> variableList;
 
     public Network(List<Variable> variableList) {
         this.variableList = variableList;
@@ -27,16 +29,32 @@ public class Network {
 
     }
 
-
+    /**
+     * This algorithm returns the probability of the query according to a simple inference from the Bayesian network,
+     * where the formula for P(B=T|J=T,M=T) when A & E are the hidden =
+     * P(B=T,J=T,M=T)/P(J=T,M=T) =
+     *
+     * P(B=T,J=T,M=T,A=T,E=T) + P(B=T,J=T,M=T,A=F,E=T) + P(B=T,J=T,M=T,A=T,E=F) + P(B=T,J=T,M=T,A=F,E=F) /
+     * ---------------------------------------------------------------------------------------------------
+     *  P(B=T,J=T,M=T,A=T,E=T) + P(B=T,J=T,M=T,A=F,E=T) + P(B=T,J=T,M=T,A=T,E=F) + P(B=T,J=T,M=T,A=F,E=F) +
+     *  P(B=F,J=T,M=T,A=T,E=T) + P(B=F,J=T,M=T,A=F,E=T) + P(B=F,J=T,M=T,A=T,E=F) + P(B=F,J=T,M=T,A=F,E=F)
+     * @param query
+     * @return The probabilistic value in the required format.
+     */
     public String simpleDeduction(String query) {
 
-        List<List<String>> queryParameter = getParameter(query); //{var_query , var_outcome}
+        //{variable of the query ,
+        //the outcomes of the query variables}
+        List<List<String>> queryParameter = getParameter(query);
 
+        //check if there is a direct answer from the data todo
         if (hasAnswer(queryParameter)) {
             return directAns(queryParameter);
-        } else {
+
+        }
+        else {
             String ans = "";
-            //System.out.println("query " + query);
+
             List<String> all_var = new ArrayList<>(this.bayesian.keySet());
 
             // find hidden variable
@@ -47,33 +65,28 @@ public class Network {
                 }
             }
 
-//            System.out.println("all var " + all_var);
-//            System.out.println("query var " + queryParameter.get(0));
-            //    System.out.println("hidden var " + hidden_list);
 
             //get the outcomes of the hidden variables
-            List<List<String>> hidden_outcome = new ArrayList<>();
+            List<List<String>> hidden_outcomes = new ArrayList<>();
             for (String hidden_var : hidden_list) {
-                hidden_outcome.add(bayesian.get(hidden_var).getVar_outcome());
+                hidden_outcomes.add(bayesian.get(hidden_var).getVar_outcome());
             }
-            // System.out.println("hidden outcome " + hidden_outcome);
 
-            //get all the sequence of the outcome of the hidden variable
-            //hidden_outcome = generateAllSequences(hidden_outcome);
-            hidden_outcome = getAllCombinations(hidden_outcome);
-//            System.out.println("all outcome of the hidden " + hidden_outcome);
+
+            //get all the combinations of the outcomes of the hidden variables
+            hidden_outcomes = getAllCombinations(hidden_outcomes);
+
 
             all_var.clear();
             all_var.addAll(queryParameter.get(0));
             all_var.addAll(hidden_list);
-            //System.out.println(all_var);
 
 
             //define the counter for the number of sum and multiply oppressions
             int plus_counter = 0;
             int multi_counter = 0;
 
-            double sumOfOuterQuery, sumOfInnerQuery = 0, sumUpper = 0, sumAllQuery = 0;
+            double sumOfOuterQuery=0, sumOfInnerQuery = 0, sumUpper = 0, sumAllQuery = 0;
             boolean startInnerQuery, startOuterQuery, upper_part = true;
 
 
@@ -89,23 +102,22 @@ public class Network {
 
 
                 //every iteration try different combination of the hidden variable with query outcome
-                for (int j = 0; j < hidden_outcome.size(); j++) {
+                for (int j = 0; j < hidden_outcomes.size(); j++) {
                     sumOfInnerQuery = 1;
 
 
                     all_outcome.clear();
                     all_outcome.addAll(queryParameter.get(1));
-                    all_outcome.addAll(hidden_outcome.get(j));
-                    // System.out.println("all outcome " + all_outcome);
+                    all_outcome.addAll(hidden_outcomes.get(j));
+
 
                     startInnerQuery = true;
                     for (int k = 0; k < all_var.size(); k++) {
 
-                        //start a new query
-                        //so also start the sum from here
-                        // P(B=T,J=T,M=T,A=T,E=T)
+                        //start a new inner query P(B=T,J=T,M=T,A=T,E=T)
+                        //so also start to multiply from here
                         if (startInnerQuery) {
-                            sumOfInnerQuery = getProbability(
+                            sumOfInnerQuery = getProbability( //todo
                                     all_var.get(k),
                                     all_outcome.get(k),
                                     all_var, all_outcome);
@@ -118,9 +130,10 @@ public class Network {
                                     all_outcome);
                             multi_counter++;
                         }
-                       // System.out.println("--- " + sumOfInnerQuery+ " --------------");
                     }
 
+                    //start outer query P(..) * p(..)
+                    //so also start to sum from here
                     if (startOuterQuery) {
                         sumOfOuterQuery = sumOfInnerQuery;
                         startOuterQuery = false;
@@ -157,7 +170,12 @@ public class Network {
     }
 
 
-
+    /**
+     * Truth table:
+     *
+     * @param lists is list of list
+     * @return all the combinations from values of the lists
+     */
     public static List<List<String>> getAllCombinations(List<List<String>> lists) {
         List<List<String>> combinations = new ArrayList<>();
         int[] indices = new int[lists.size()];
@@ -193,91 +211,17 @@ public class Network {
 
 
     /**
-     * Truth table:
-     *
-     * @param inputLists is list of list
-     * @return all the sequence from values of the lists
-     */
-    public static List<List<String>> generateAllSequences(List<List<String>> inputLists) {
-        List<List<String>> combinations = new ArrayList<>();
-
-        // outer loop: iterate through each list in the input
-        for (List<String> list : inputLists) {
-            // initialize a new list of combinations for the current list
-            List<List<String>> newCombinations = new ArrayList<>();
-
-            // inner loop: iterate through each element in the current list
-            for (String element : list) {
-                // if this is the first list, add each element as a new combination
-                if (combinations.isEmpty()) {
-                    newCombinations.add(Collections.singletonList(element));
-
-                } else {
-                    // otherwise, add each element to each existing combination
-                    for (List<String> combination : combinations) {
-                        List<String> newCombination = new ArrayList<>(combination);
-                        newCombination.add(element);
-
-                        newCombinations.add(newCombination);
-
-                    }
-                }
-            }
-
-            // replace the existing combinations with the new combinations
-            combinations = newCombinations;
-            // System.out.println(combinations);
-        }
-
-        return combinations;
-//        List<List<String>> sequences = new ArrayList<>();
-//        if (inputLists.isEmpty()) {
-//            return sequences;
-//        }
-//
-//        List<String> firstList = inputLists.get(0);
-//        for (String value : firstList) {
-//            List<String> sequence = new ArrayList<>();
-//            sequence.add(value);
-//            sequences.add(sequence);
-//        }
-//
-//        for (int i = 1; i < inputLists.size(); i++) {
-//            List<String> list = inputLists.get(i);
-//            List<List<String>> newSequences = new ArrayList<>();
-//            for (List<String> sequence : sequences) {
-//                if (list.size() > sequence.size()) {
-//                    for (String value : list) {
-//                        List<String> newSequence = new ArrayList<>(sequence);
-//                        newSequence.add(value);
-//                        newSequences.add(newSequence);
-//                    }
-//                } else {
-//                    // Add the remaining values to the end of the sequence
-//                    sequence.addAll(list);
-//                    newSequences.add(sequence);
-//                }
-//            }
-//            sequences = newSequences;
-//        }
-//        System.out.println("sequences: "+sequences);
-//      //  return sequences;
-
-    }
-
-
-    /**
      * @param var
      * @param varOutcome
      * @param queryVar
      * @param queryOutcome
-     * @return
+     * @return The probabilistic value.
      */
     private double getProbability(String var, String varOutcome, List<String> queryVar, List<String> queryOutcome) {
 
 
         // not have parents,
-        // so we can get the value directly from the cpt of this var
+        // so we can get the value directly from the CPt of this variable
         if (bayesian.get(var).getVar_parents().isEmpty()) {
             return this.bayesian.get(var).getCptMap().get(null).get(varOutcome);
         }
@@ -293,7 +237,7 @@ public class Network {
                     parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(queryVar.get(i)))]
                             = i;
                     j++;
-                    //System.out.println(parentsIndex.length);
+
                     if (j >= parentsIndex.length) break;
 
                 }
@@ -350,7 +294,7 @@ public class Network {
      * query variable order at the same index as in the variable list.
      */
     private List<List<String>> getParameter(String query) {
-        //System.out.println(query);
+
         List<String> var_query = new ArrayList<>();
         List<String> var_outcome = new ArrayList<>();
 
@@ -370,19 +314,23 @@ public class Network {
             var_outcome.add(evi_[1]);
         }
 
-        List<List<String>> prm = new ArrayList<>();
-        prm.add(var_query);
-        prm.add(var_outcome);
-        return prm;
+        List<List<String>> parameter = new ArrayList<>();
+        parameter.add(var_query);
+        parameter.add(var_outcome);
+        return parameter;
     }
 
 
     public String VariableElimination(String query) {
 
-        //{var_query , var_outcome}
+        //{variable of the query ,
+        //the outcomes of the query variables}
         List<List<String>> queryParameter = getParameter(query);
+
+        //check if there is a direct answer from the data todo
         if (hasAnswer(queryParameter)) {
             return directAns(queryParameter);
+
         }
 
 
@@ -399,7 +347,7 @@ public class Network {
             }
         }
 
-       // System.out.println(varList);
+
 
 
         // find hidden variable
@@ -418,7 +366,6 @@ public class Network {
     }
 
 
-
     private String VariableElimination(List<String> evidence, List<String> evidence_outcome, List<String> hidden_list, List<String> varList) {
 
         List<String> query_var = new ArrayList<>();
@@ -427,22 +374,27 @@ public class Network {
         String outcome_var = evidence_outcome.get(0);
         evidence.remove(0);
         evidence_outcome.remove(0);
-      //  System.out.println(varList);
+
+
+
         List<Factor> factors = new ArrayList<Factor>();
         int removeIndex = 0;
 
-        for (String s : varList) {
+
+        //create factor for each variable
+        for (String variable : varList) {
             Factor factor = new Factor();
-            factor.toFactor(this.bayesian.get(s), evidence, evidence_outcome);
+            factor.toFactor(this.bayesian.get(variable), evidence, evidence_outcome);
 
-
-            //todo add the case if the factor is one line only
+            //If an instantiated CPT becomes one
+            //valued, discard the factor
             if (factor.getSize() > 1) {
                 factors.add(factor);
             }
+
         }
 
-     //   System.out.println(factors);
+
 
         List<Integer> index_join = new ArrayList<>();
         List<String> query_var_to_Join = new ArrayList<>(); //todo delete
@@ -462,14 +414,16 @@ public class Network {
 
             while (factors.size() > 1) {
                 index_factor.clear();
+
                 //find all the factors that contains the hidden var
+                //and save there index
                 for (int i = 0; i < factors.size(); i++) {
-                    // System.out.println(factors.get(i).getVarOfTheFactor());
+
                     if (factors.get(i).getVarOfTheFactor().contains(hidden_var)) {
                         index_factor.add(i);
                     }
                 }
-                //System.out.println(index_factor);
+
 
                 //if there is only one factor that contains the hidden var, we save this factor
                 if (index_factor.size() < 2) break;
@@ -489,20 +443,22 @@ public class Network {
             factors.get(index_join.get(0)).elimination(hidden_var);
         }
 
-            ////////////////////////////////////
-            for(int i=0; i<factors.size()-1; i++) {
-                factors.set(0, factors.get(0).join(factors.get(1)));
-                factors.remove(1);
+        //Join all remaining factors
+        for (int i = 0; i < factors.size() - 1; i++) {
+            factors.set(0, factors.get(0).join(factors.get(1)));
+            factors.remove(1);
 
-            }
+        }
 
-   //     System.out.println("--------------"+ factors.get(0).getMulti_counter());
-            int sum_x=0,sum_plus=0;
-            sum_x += factors.get(0).getMulti_counter();
-            sum_plus += factors.get(0).getPlus_counter();
-            int index_var = factors.get(0).getVarOfTheFactor().indexOf(var);
+         // get the number of multiply and sum operations
+        int multi_counter = 0, Plus_counter = 0;
+        multi_counter += factors.get(0).getMulti_counter();
+        Plus_counter += factors.get(0).getPlus_counter();
 
-            double prob=0 , sum=-1;
+
+        int index_var = factors.get(0).getVarOfTheFactor().indexOf(var);
+
+        double prob = 0, sum = -1;
 
 
         Set<List<String>> set = factors.get(0).getFactor().keySet();
@@ -517,7 +473,7 @@ public class Network {
                 sum = factors.get(0).getFactor().get(first_list.get(0)).get(temp);
             } else {
                 sum += factors.get(0).getFactor().get(first_list.get(0)).get(temp);
-                sum_plus++;
+                Plus_counter++;
             }
             if (temp.get(index_var).equals(outcome_var)) {
                 prob = factors.get(0).getFactor().get(first_list.get(0)).get(temp);
@@ -525,7 +481,7 @@ public class Network {
 
         }
 
-        return "" +new DecimalFormat("0.00000").format (prob/sum) +","+sum_plus+","+sum_x +"\n";
+        return "" + new DecimalFormat("0.00000").format(prob / sum) + "," + Plus_counter + "," + multi_counter + "\n";
 
 
     }
@@ -596,7 +552,9 @@ public class Network {
             factor_b = factors.get(index_factor.get(i + 1));
             diff_var = findDiffVars(factor_a.getVarOfTheFactor(), factor_b.getVarOfTheFactor(), query_var_to_Join);
 
-            for (String var_name:diff_var){
+
+            //find how many line this variable will add
+            for (String var_name : diff_var) {
                 var = this.bayesian.get(var_name);
                 num_line *= var.getVar_outcome().size();
             }
@@ -604,48 +562,47 @@ public class Network {
 //            System.out.println(factor_b.getSize());
 //            System.out.println(factor_a);
 //            System.out.println(factor_b);
-            num_line = num_line - Math.max(factor_a.getSize(),factor_b.getSize());
+            num_line = num_line - Math.max(factor_a.getSize(), factor_b.getSize());
 
+            // witch a pair of factor will add the less number of row
+            if (num_line < min_num_line) {
+                min_num_line = num_line;
+            }
 
-            if (num_line<min_num_line){
-                min_num_line =num_line;}
-
-            if (num_lines_and_indexes.containsKey(num_line)){
+            if (num_lines_and_indexes.containsKey(num_line)) {
                 List<Integer> indexs = num_lines_and_indexes.get(num_line);
                 indexs.add(index_factor.get(i));
-                indexs.add(index_factor.get(i+1));
-            }else {
+                indexs.add(index_factor.get(i + 1));
+            } else {
                 index_to_put = new ArrayList<Integer>();
                 index_to_put.add(index_factor.get(i));
-                index_to_put.add(index_factor.get(i+1));
+                index_to_put.add(index_factor.get(i + 1));
                 num_lines_and_indexes.put(num_line, index_to_put);
             }
         }
-        if(num_lines_and_indexes.get(min_num_line).size() == 2)
+        if (num_lines_and_indexes.get(min_num_line).size() == 2)
             return num_lines_and_indexes.get(min_num_line);
         else {
             int min_ascii = Integer.MAX_VALUE;
             ArrayList<Integer> indexes_to_return = new ArrayList<Integer>();
-            for(int i = 0; i < num_lines_and_indexes.get(min_num_line).size()-1; i+=2 ) {
+            for (int i = 0; i < num_lines_and_indexes.get(min_num_line).size() - 1; i += 2) {
                 int sum_ascii = 0;
-                for(String var_name : findDiffVars(factors.get(num_lines_and_indexes.get(min_num_line).get(i)).getVarOfTheFactor(),
-                        factors.get(num_lines_and_indexes.get(min_num_line).get(i+1)).getVarOfTheFactor(),query_var_to_Join)) {
-                    for(int j = 0; j < var_name.length(); j++)
-                        sum_ascii += (int)var_name.charAt(j);
+                for (String var_name : findDiffVars(factors.get(num_lines_and_indexes.get(min_num_line).get(i)).getVarOfTheFactor(),
+                        factors.get(num_lines_and_indexes.get(min_num_line).get(i + 1)).getVarOfTheFactor(), query_var_to_Join)) {
+                    for (int j = 0; j < var_name.length(); j++)
+                        sum_ascii += (int) var_name.charAt(j);
                 }
-                if(sum_ascii < min_ascii) {
+                if (sum_ascii < min_ascii) {
                     min_ascii = sum_ascii;
                     indexes_to_return.clear();
                     indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i));
-                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i+1));
+                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i + 1));
                 }
             }
             return indexes_to_return;
         }
 
     }
-
-
 
 
     private List<String> findDiffVars(List<String> vars_name_a, List<String> vars_name_b, List<String> query_vars) {
@@ -673,11 +630,15 @@ public class Network {
         return sum;
     }
 
-    private boolean ancestor(String name, List<String> evidence) {
-        if (evidence.isEmpty()) return false;
-        if (evidence.contains(name)) return true;
-        for (String s : evidence) {
-            if (ancestor(name, bayesian.get(s).getParentsName()))
+
+    /**
+     * This method checks if a variable is an ancestor of query or evidence variables.
+     */
+    private boolean ancestor(String name, List<String> parents) {
+        if (parents.isEmpty()) return false;
+        if (parents.contains(name)) return true;
+        for (String var : parents) {
+            if (ancestor(name, bayesian.get(var).getParentsName()))
                 return true;
         }
         return false;
@@ -685,7 +646,10 @@ public class Network {
 
     }
 
-
+    /**
+     * @param queryParameter
+     * @return The probabilistic value in the required format.
+     */
     public String directAns(List<List<String>> queryParameter) {
         String ans = "";
         double value = getProbability(

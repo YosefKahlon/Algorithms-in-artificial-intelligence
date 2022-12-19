@@ -12,6 +12,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * This class gets as input the XML file
+ * and builds the variables of the network from it.
+ */
 public class XmlReader {
 
     private Document document;
@@ -35,12 +40,13 @@ public class XmlReader {
 
     }
 
-
+    /**
+     * @param doc
+     * @return list of variables
+     */
     public List<Variable> getVar(Document doc) {
 
-
         HashMap<String, Variable> varMap = new HashMap<>();
-//        List<Variable> variableList = new ArrayList<>();
 
         // Read the tag VARIABLE from the xml
         NodeList varList = doc.getElementsByTagName("VARIABLE");
@@ -49,22 +55,22 @@ public class XmlReader {
         //run on VARIABLE tag
         for (int i = 0; i < varList.getLength(); i++) {
             Node variableNode = varList.item(i);
-            String name= "";
+            String name = "";
             List<String> outcome = new ArrayList<>();
 
             // has sub-elements
-            if (variableNode.getNodeType() == Node.ELEMENT_NODE){
+            if (variableNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList childNodes = variableNode.getChildNodes();
 
                 for (int j = 0; j < childNodes.getLength(); j++) {
                     Node childNode = childNodes.item(j);
 
                     //get the name of the variable
-                    if (childNode.getNodeName().equals("NAME")){
+                    if (childNode.getNodeName().equals("NAME")) {
                         name = childNode.getTextContent();
 
                         //get the outcome of the variable
-                    }else if(childNode.getNodeName().equals("OUTCOME")){
+                    } else if (childNode.getNodeName().equals("OUTCOME")) {
                         NodeList outcomeNode = childNode.getChildNodes();
                         for (int k = 0; k < outcomeNode.getLength(); k++) {
                             outcome.add(outcomeNode.item(k).getTextContent());
@@ -72,13 +78,11 @@ public class XmlReader {
                     }
 
 
-
                 }
                 Variable v = new Variable(name);
                 v.setVar_outcome(outcome);
                 varMap.put(name, v);
             }
-
 
 
         }
@@ -107,17 +111,12 @@ public class XmlReader {
                         case "GIVEN":
                             NodeList varParents = childNode.getChildNodes();
                             for (int k = 0; k < varParents.getLength(); k++) {
-                                //add parents
 
+                                //add parents
                                 varMap.get(name).getVar_parents().add(
                                         varMap.get(varParents.item(k).getTextContent())
                                 );
 
-//                                varMap.get(name).getVar_parents().add(
-//                                        varMap.get(varParents.item(k).getTextContent()).toString());
-
-                                //add child
-                                varMap.get(varParents.item(k).getTextContent()).getVar_children().add(varMap.get(name).toString());
                             }
 
                             break;
@@ -143,8 +142,8 @@ public class XmlReader {
                 }
             }
         }
-
-        varMap.forEach((key,value)->{
+        //create CPT for each variable
+        varMap.forEach((key, value) -> {
             varMap.get(key).CreateCPT();
         });
 

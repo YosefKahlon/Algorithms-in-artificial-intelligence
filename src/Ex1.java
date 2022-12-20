@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Ex1 {
 
-    private static String input = "input.txt";
+    private static String input = "input2.txt";
     private static String output = "filename.txt";
 
     public static void main(String[] args) {

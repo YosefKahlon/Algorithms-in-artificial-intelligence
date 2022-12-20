@@ -270,10 +270,10 @@ public class Network {
             }
         }
 
-//        //prants list
-//        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size()-1){
-//            return false;
-//        }
+        //prants list
+        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size()-1){
+            return false;
+        }
 
         for (int i = 1; i < queryParameter.get(0).size(); i++) {
             //System.out.println("this is test " +this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents() );

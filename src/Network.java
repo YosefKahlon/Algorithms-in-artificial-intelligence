@@ -102,33 +102,17 @@ public class Network {
                     hidden_outcome_of_query.add(this.bayesian.get(queryParameter.get(0).get(0)).getVar_outcome().get(i));
                 }
             }
-
-
-
-            System.out.println(hidden_outcome_of_query);
-
-            System.out.println("var outcome" + bayesian.get(all_var.get(0)).getVar_outcome());
+            
             // run on the query variable outcome list
             for (int i = 0; i < hidden_outcome_of_query.size(); i++) {
                 sumOfOuterQuery = 0;
                 startOuterQuery = true;
 
+                //change the outcome for the query variable after the upper part of this formula
                 if (!upper_part) {
-                    System.out.println("--------------------------------------------------------------------");
-
-//                    if (i== 1){
-                    //set outcome for the query
-                   // queryParameter.get(1).set(0, bayesian.get(all_var.get(0)).getVar_outcome().get(i));
                     queryParameter.get(1).set(0, hidden_outcome_of_query.get(i));
-                        System.out.println("var outcome after change " + hidden_outcome_of_query.get(0));
-
-////                    if (i== 2){
-//                        queryParameter.get(1).set(0, hidden_outcome_of_query.get(1));
-//                        System.out.println("var outcome after change " + hidden_outcome_of_query.get(1));
                     }
-                  //  System.out.println("var outcome after change " + bayesian.get(all_var.get(0)).getVar_outcome()
-                    //  .get(i));
-              //  }
+
 
                 //every iteration try different combination of the hidden variable with query outcome
                 for (int j = 0; j < hidden_outcomes.size(); j++) {

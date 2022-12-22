@@ -111,6 +111,7 @@ public class Variable {
             for (int i = 0; i < this.var_outcome.size(); i++) {
                 prob.put(this.var_outcome.get(i), this.var_cpt.get(i));
             }
+
             this.cptMap.put(null, new HashMap<>(prob));
 
         } else {

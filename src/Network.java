@@ -34,17 +34,19 @@ public class Network {
      * This algorithm returns the probability of the query according to a simple inference from the Bayesian network,
      * where the formula for P(B=T|J=T,M=T) when A & E are the hidden =
      * P(B=T,J=T,M=T)/P(J=T,M=T) =
-     *
+     * <p>
      * P(B=T,J=T,M=T,A=T,E=T) + P(B=T,J=T,M=T,A=F,E=T) + P(B=T,J=T,M=T,A=T,E=F) + P(B=T,J=T,M=T,A=F,E=F) /
      * ---------------------------------------------------------------------------------------------------
-     *  P(B=T,J=T,M=T,A=T,E=T) + P(B=T,J=T,M=T,A=F,E=T) + P(B=T,J=T,M=T,A=T,E=F) + P(B=T,J=T,M=T,A=F,E=F) +
-     *  P(B=F,J=T,M=T,A=T,E=T) + P(B=F,J=T,M=T,A=F,E=T) + P(B=F,J=T,M=T,A=T,E=F) + P(B=F,J=T,M=T,A=F,E=F)
+     * P(B=T,J=T,M=T,A=T,E=T) + P(B=T,J=T,M=T,A=F,E=T) + P(B=T,J=T,M=T,A=T,E=F) + P(B=T,J=T,M=T,A=F,E=F) +
+     * P(B=F,J=T,M=T,A=T,E=T) + P(B=F,J=T,M=T,A=F,E=T) + P(B=F,J=T,M=T,A=T,E=F) + P(B=F,J=T,M=T,A=F,E=F)
+     *
      * @param query
      * @return The probabilistic value in the required format.
      */
-    public String simpleDeduction(String query) {
-
+    public String simpleInference(String query) {
+        System.out.println(query);
         //{variable of the query ,
+
         //the outcomes of the query variables}
         List<List<String>> queryParameter = getParameter(query);
 
@@ -52,8 +54,7 @@ public class Network {
         if (hasAnswer(queryParameter)) {
             return directAns(queryParameter);
 
-        }
-        else {
+        } else {
             String ans = "";
 
             List<String> all_var = new ArrayList<>(this.bayesian.keySet());
@@ -87,20 +88,47 @@ public class Network {
             int plus_counter = 0;
             int multi_counter = 0;
 
-            double sumOfOuterQuery=0, sumOfInnerQuery = 0, sumUpper = 0, sumAllQuery = 0;
+            double sumOfOuterQuery = 0, sumOfInnerQuery = 0, sumUpper = 0, sumAllQuery = 0;
             boolean startInnerQuery, startOuterQuery, upper_part = true;
 
 
             List<String> all_outcome = new ArrayList<>();
 
+            List<String> hidden_outcome_of_query = new ArrayList<>();
+            hidden_outcome_of_query.add(queryParameter.get(1).get(0));
+
+            for (int i = 0; i < this.bayesian.get(queryParameter.get(0).get(0)).getVar_outcome().size(); i++) {
+                if (!queryParameter.get(1).get(0).equals(this.bayesian.get(queryParameter.get(0).get(0)).getVar_outcome().get(i))) {
+                    hidden_outcome_of_query.add(this.bayesian.get(queryParameter.get(0).get(0)).getVar_outcome().get(i));
+                }
+            }
+
+
+
+            System.out.println(hidden_outcome_of_query);
+
+            System.out.println("var outcome" + bayesian.get(all_var.get(0)).getVar_outcome());
             // run on the query variable outcome list
-            for (int i = 0; i < bayesian.get(all_var.get(0)).getVar_outcome().size(); i++) {
+            for (int i = 0; i < hidden_outcome_of_query.size(); i++) {
                 sumOfOuterQuery = 0;
                 startOuterQuery = true;
 
-                //set outcome for the query
-                queryParameter.get(1).set(0, bayesian.get(all_var.get(0)).getVar_outcome().get(i));
+                if (!upper_part) {
+                    System.out.println("--------------------------------------------------------------------");
 
+//                    if (i== 1){
+                    //set outcome for the query
+                   // queryParameter.get(1).set(0, bayesian.get(all_var.get(0)).getVar_outcome().get(i));
+                    queryParameter.get(1).set(0, hidden_outcome_of_query.get(i));
+                        System.out.println("var outcome after change " + hidden_outcome_of_query.get(0));
+
+////                    if (i== 2){
+//                        queryParameter.get(1).set(0, hidden_outcome_of_query.get(1));
+//                        System.out.println("var outcome after change " + hidden_outcome_of_query.get(1));
+                    }
+                  //  System.out.println("var outcome after change " + bayesian.get(all_var.get(0)).getVar_outcome()
+                    //  .get(i));
+              //  }
 
                 //every iteration try different combination of the hidden variable with query outcome
                 for (int j = 0; j < hidden_outcomes.size(); j++) {
@@ -111,6 +139,7 @@ public class Network {
                     all_outcome.addAll(queryParameter.get(1));
                     all_outcome.addAll(hidden_outcomes.get(j));
 
+                    System.out.println(all_outcome);
 
                     startInnerQuery = true;
                     for (int k = 0; k < all_var.size(); k++) {
@@ -209,45 +238,53 @@ public class Network {
     }
 
 
-
-
     /**
      * @param var
      * @param varOutcome
-     * @param queryVar
-     * @param queryOutcome
+     * @param VarList
+     * @param outcomeList
      * @return The probabilistic value.
      */
-    private double getProbability(String var, String varOutcome, List<String> queryVar, List<String> queryOutcome) {
+    private double getProbability(String var, String varOutcome, List<String> VarList, List<String> outcomeList) {
 
+        //System.out.println(var);
 
         // not have parents,
         // so we can get the value directly from the CPt of this variable
         if (bayesian.get(var).getVar_parents().isEmpty()) {
+//            System.out.println("empty");
+//            System.out.println(this.bayesian.get(var).getCptMap());
+//            System.out.println(this.bayesian.get(var).getCptMap().get(null).get(varOutcome));
             return this.bayesian.get(var).getCptMap().get(null).get(varOutcome);
         }
         // do have parents
         else {
             //search the index of the parent, so we can find witch outcome value need to take.
             int[] parentsIndex = new int[this.bayesian.get(var).getVar_parents().size()];
-
+            List<String> name = new ArrayList<>();
             int j = 0;
 
-            for (int i = 0; i < queryVar.size(); i++) {
-                if (this.bayesian.get(var).getVar_parents().toString().contains(queryVar.get(i))) {
-                    parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(queryVar.get(i)))]
-                            = i;
+            for (int i = 0; i < VarList.size(); i++) {
+                if (this.bayesian.get(var).getParentsName().contains(VarList.get(i))) {
+                    parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(VarList.get(i)))
+                            ] = i;
+                    name.add(VarList.get(i));
                     j++;
-
+                    //}
                     if (j >= parentsIndex.length) break;
-
                 }
+
             }
             // add the outcomes and return the probability
             List<String> parents_outcome = new ArrayList<>();
             for (int i = 0; i < this.bayesian.get(var).getVar_parents().size(); i++) {
-                parents_outcome.add(queryOutcome.get(parentsIndex[i]));
+                parents_outcome.add(outcomeList.get(parentsIndex[i]));
             }
+        //    System.out.println("not empty" + this.bayesian.get(var).getCptMap());
+//            System.out.println(this.bayesian.get(var).getCptMap().get(parents_outcome));
+//            System.out.println(name);
+//            System.out.println(parents_outcome);
+//            System.out.println(this.bayesian.get(var).getCptMap().get(parents_outcome).get(varOutcome));
             return this.bayesian.get(var).getCptMap().get(parents_outcome).get(varOutcome);
 
         }
@@ -272,7 +309,7 @@ public class Network {
         }
 
         //prants list
-        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size()-1){
+        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size() - 1) {
             return false;
         }
 
@@ -321,6 +358,25 @@ public class Network {
         return parameter;
     }
 
+    /**
+     * @param queryParameter
+     * @return The probabilistic value in the required format.
+     */
+    public String directAns(List<List<String>> queryParameter) {
+        String ans = "";
+        double value = getProbability(
+                queryParameter.get(0).get(0),
+                queryParameter.get(1).get(0),
+                queryParameter.get(0),
+                queryParameter.get(1));
+
+        DecimalFormat df = new DecimalFormat("0.00000");
+        String formatted = df.format(value);
+
+        ans += formatted + ",0,0\n";
+        return ans;
+    }
+
 
     public String VariableElimination(String query) {
 
@@ -349,8 +405,6 @@ public class Network {
         }
 
 
-
-
         // find hidden variable
         List<String> hidden_list = new ArrayList<>();
         for (String variable : varList) {
@@ -377,7 +431,6 @@ public class Network {
         evidence_outcome.remove(0);
 
 
-
         List<Factor> factors = new ArrayList<Factor>();
         int removeIndex = 0;
 
@@ -394,7 +447,6 @@ public class Network {
             }
 
         }
-
 
 
         List<Integer> index_join = new ArrayList<>();
@@ -451,7 +503,7 @@ public class Network {
 
         }
 
-         // get the number of multiply and sum operations
+        // get the number of multiply and sum operations
         int multi_counter = 0, Plus_counter = 0;
         multi_counter += factors.get(0).getMulti_counter();
         Plus_counter += factors.get(0).getPlus_counter();
@@ -647,25 +699,4 @@ public class Network {
 
     }
 
-    /**
-     * @param queryParameter
-     * @return The probabilistic value in the required format.
-     */
-    public String directAns(List<List<String>> queryParameter) {
-        String ans = "";
-        double value = getProbability(
-                queryParameter.get(0).get(0),
-                queryParameter.get(1).get(0),
-                queryParameter.get(0),
-                queryParameter.get(1));
-
-        DecimalFormat df = new DecimalFormat("0.00000");
-        String formatted = df.format(value);
-
-        ans += formatted + ",0,0\n";
-        return ans;
-    }
-
-
 }
-

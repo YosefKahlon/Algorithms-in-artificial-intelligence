@@ -40,7 +40,7 @@ public class XmlReader {
 
     }
 
-    /**
+    /** This method defines and creates the network structure
      * @param doc
      * @return list of variables
      */

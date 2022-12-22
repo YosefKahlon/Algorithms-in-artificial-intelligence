@@ -9,8 +9,8 @@ import java.util.*;
 
 public class Ex1 {
 
-    private static String input = "input6.txt";
-    private static String output = "output7.txt";
+    private static String input = "input7.txt";
+    private static String output = "output3.txt";
 
     public static void main(String[] args) {
 
@@ -81,7 +81,7 @@ public class Ex1 {
                 switch (algo_num[1]) {
                     case ("1"):
                        // System.out.println(bayesian.simpleDeduction(p_queries[1]));
-                        myWriter.write(bayesian.simpleDeduction(p_queries[1]));
+                        myWriter.write(bayesian.simpleInference(p_queries[1]));
                         break;
                     case ("2"):
                         myWriter.write( bayesian.VariableElimination(p_queries[1]));
@@ -90,6 +90,7 @@ public class Ex1 {
                     case ("3"):
                         break;
                 }
+                //break;
 
 
             }

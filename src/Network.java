@@ -24,6 +24,7 @@ public class Network {
             System.out.println(this.variableList.get(i).toString());
             System.out.println("Parents: " + this.variableList.get(i).getVar_parents());
             System.out.println("CPT: " + this.variableList.get(i).getCptMap());
+            System.out.println("CPT SIZE: " + this.variableList.get(i).getCptMap().size());
             System.out.println("==========");
         }
 

@@ -328,6 +328,8 @@ public class Network {
      * query variable order at the same index as in the variable list.
      */
     private List<List<String>> getParameter(String query) {
+
+
         List<String> var_query = new ArrayList<>();
         List<String> var_outcome = new ArrayList<>();
 

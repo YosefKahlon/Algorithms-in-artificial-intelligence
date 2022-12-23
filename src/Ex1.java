@@ -5,6 +5,7 @@ import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class Ex1 {
@@ -75,8 +76,16 @@ public class Ex1 {
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");
-                //System.out.println(p_queries[1]);
+               // System.out.println(Arrays.toString(p_queries));
 
+                //empty query
+//                if (p_queries.length < 2){
+//                    String ans= "";
+//                    String formatted = "0.00000";
+//                    ans += formatted + ",0,0\n";
+//                    myWriter.write(ans);
+//                    continue;
+//                }
 
                 switch (algo_num[1]) {
                     case ("1"):

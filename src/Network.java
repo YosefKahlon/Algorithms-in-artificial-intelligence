@@ -44,7 +44,6 @@ public class Network {
      * @return The probabilistic value in the required format.
      */
     public String simpleInference(String query) {
-        System.out.println(query);
         //{variable of the query ,
 
         //the outcomes of the query variables}
@@ -102,7 +101,7 @@ public class Network {
                     hidden_outcome_of_query.add(this.bayesian.get(queryParameter.get(0).get(0)).getVar_outcome().get(i));
                 }
             }
-            
+
             // run on the query variable outcome list
             for (int i = 0; i < hidden_outcome_of_query.size(); i++) {
                 sumOfOuterQuery = 0;
@@ -111,7 +110,7 @@ public class Network {
                 //change the outcome for the query variable after the upper part of this formula
                 if (!upper_part) {
                     queryParameter.get(1).set(0, hidden_outcome_of_query.get(i));
-                    }
+                }
 
 
                 //every iteration try different combination of the hidden variable with query outcome
@@ -123,7 +122,6 @@ public class Network {
                     all_outcome.addAll(queryParameter.get(1));
                     all_outcome.addAll(hidden_outcomes.get(j));
 
-                    System.out.println(all_outcome);
 
                     startInnerQuery = true;
                     for (int k = 0; k < all_var.size(); k++) {
@@ -190,7 +188,7 @@ public class Network {
      * @param lists is list of list
      * @return all the combinations from values of the lists
      */
-    public static List<List<String>> getAllCombinations(List<List<String>> lists) {
+    private static List<List<String>> getAllCombinations(List<List<String>> lists) {
         List<List<String>> combinations = new ArrayList<>();
         int[] indices = new int[lists.size()];
         boolean done = false;
@@ -222,61 +220,87 @@ public class Network {
     }
 
 
+//    /**
+//     * In this method we search for the probabilistic value, by search the indexes
+//     * of the variable parents and get the outcomes we need from the input of the function.
+//     * @return The probabilistic value.
+//     */
+//    private double getProbability(String var, String varOutcome, List<String> VarList, List<String> outcomeList) {
+//
+//        //System.out.println(var);
+//
+//
+//        if (bayesian.get(var).getVar_parents().isEmpty()) {
+//
+//            return this.bayesian.get(var).getCptMap().get(null).get(varOutcome);
+//        }
+//
+//        else {
+//            //search the index of the parent, so we can find witch outcome value need to take.
+//            int[] parentsIndex = new int[this.bayesian.get(var).getVar_parents().size()];
+//           // List<String> name = new ArrayList<>();
+//            int j = 0;
+//
+//            for (int i = 0; i < VarList.size(); i++) {
+//                if (this.bayesian.get(var).getParentsName().contains(VarList.get(i))) {
+//                    parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(VarList.get(i)))
+//                            ] = i;
+//                   // name.add(VarList.get(i));
+//                    j++;
+//                    //}
+//                    if (j >= parentsIndex.length) break;
+//                }
+//
+//            }
+//
+//            List<String> outcome = new ArrayList<>();
+//            for (int i = 0; i < this.bayesian.get(var).getVar_parents().size(); i++) {
+//                outcome.add(outcomeList.get(parentsIndex[i]));
+//            }
+//
+//            return this.bayesian.get(var).getCptMap().get(outcome).get(varOutcome);
+//
+//        }
+//    }
+
     /**
-     * @param var
-     * @param varOutcome
-     * @param VarList
-     * @param outcomeList
+     * In this method we search for the probabilistic value, by search the indexes
+     * of the variable parents and get the outcomes we need from the input of the function.
+     *
      * @return The probabilistic value.
      */
     private double getProbability(String var, String varOutcome, List<String> VarList, List<String> outcomeList) {
-
-        //System.out.println(var);
-
         // not have parents,
-        // so we can get the value directly from the CPt of this variable
+        // so we can get the value directly from the CPT of this variable
         if (bayesian.get(var).getVar_parents().isEmpty()) {
-//            System.out.println("empty");
-//            System.out.println(this.bayesian.get(var).getCptMap());
-//            System.out.println(this.bayesian.get(var).getCptMap().get(null).get(varOutcome));
             return this.bayesian.get(var).getCptMap().get(null).get(varOutcome);
-        }
-        // do have parents
-        else {
-            //search the index of the parent, so we can find witch outcome value need to take.
-            int[] parentsIndex = new int[this.bayesian.get(var).getVar_parents().size()];
-            List<String> name = new ArrayList<>();
-            int j = 0;
+        } else {
 
+
+            //If the var variable does have parents, then the function needs to
+            // find the index of the parent variables in the
+            // VarList input, so that it can look up the corresponding outcomes in the outcomeList input.
+            Map<String, Integer> parentIndices = new HashMap<>();
             for (int i = 0; i < VarList.size(); i++) {
                 if (this.bayesian.get(var).getParentsName().contains(VarList.get(i))) {
-                    parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(VarList.get(i)))
-                            ] = i;
-                    name.add(VarList.get(i));
-                    j++;
-                    //}
-                    if (j >= parentsIndex.length) break;
+                    // store the index of the parent variables
+                    parentIndices.put(VarList.get(i), i);
                 }
-
             }
+
             // add the outcomes and return the probability
-            List<String> parents_outcome = new ArrayList<>();
-            for (int i = 0; i < this.bayesian.get(var).getVar_parents().size(); i++) {
-                parents_outcome.add(outcomeList.get(parentsIndex[i]));
+            List<String> outcome = new ArrayList<>();
+            for (String parent : this.bayesian.get(var).getParentsName()) {
+                outcome.add(outcomeList.get(parentIndices.get(parent)));
             }
-        //    System.out.println("not empty" + this.bayesian.get(var).getCptMap());
-//            System.out.println(this.bayesian.get(var).getCptMap().get(parents_outcome));
-//            System.out.println(name);
-//            System.out.println(parents_outcome);
-//            System.out.println(this.bayesian.get(var).getCptMap().get(parents_outcome).get(varOutcome));
-            return this.bayesian.get(var).getCptMap().get(parents_outcome).get(varOutcome);
 
+            return this.bayesian.get(var).getCptMap().get(outcome).get(varOutcome);
         }
     }
 
 
     /**
-     * This method check if  the given query have direct answer.
+     * This method check if the given query have direct answer.
      *
      * @param queryParameter
      * @return boolean
@@ -292,16 +316,13 @@ public class Network {
             }
         }
 
-        //prants list
+        //if the query contains all the parents, so we can get directly  from the CPT
         if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size() - 1) {
             return false;
         }
 
         for (int i = 1; i < queryParameter.get(0).size(); i++) {
-            //System.out.println("this is test " +this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents() );
-
             if (!this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().toString().contains(queryParameter.get(0).get(i))) {
-                // System.out.println("this is also ");
                 return false;
             }
         }
@@ -382,7 +403,7 @@ public class Network {
         List<String> varList = new ArrayList<>(queryParameter.get(0));
         for (Variable variable : this.variableList) {
             if (!varList.contains(variable.getName())) {
-                if (ancestor(variable.getName(), queryParameter.get(0))) {
+                if (isAncestor(variable.getName(), queryParameter.get(0))) {
                     varList.add(variable.getName());
                 }
             }
@@ -466,7 +487,7 @@ public class Network {
                 if (index_factor.size() < 2) break;
 
                 // find two factor to make join
-                index_join = findJoin(factors, index_factor, query_var_to_Join); //todo i did not finish
+                index_join = findJoin(factors, index_factor, query_var_to_Join);
 
                 //join the two factor and add the new to the list of the factor
                 //Factor joinResult = factors.get(index_join.get(0)).join(factors.get(index_join.get(1)));
@@ -522,141 +543,198 @@ public class Network {
 
 
     }
-
-    private List<Integer> findJoin(List<Factor> factors, List<Integer> index_factor, List<String> query_var_to_Join) {
-
-
-//        List<Factor> factors1 = new ArrayList<>();
-//        for (int i = 0; i < index_factor.size(); i++) {
-//            factors1.add(factors.get(index_factor.get(i)));
-//        }
+//
+//    private List<Integer> findJoin(List<Factor> factors, List<Integer> index_factor, List<String> query_var_to_Join) {
+//
+//        int min_num_line = Integer.MAX_VALUE;
+//        List<String> diff_var;
+//        List<Integer> index_to_put;
+//
+//        Map<Integer, List<Integer>> num_lines_and_indexes = new HashMap<Integer, List<Integer>>();
+//
+//        Variable var;
+//
+//        Factor factor_a, factor_b;
+//
+//        for (int i = 0; i < index_factor.size() - 1; i++) {
+//            int num_line = 1;
+//            factor_a = factors.get(index_factor.get(i));
+//            factor_b = factors.get(index_factor.get(i + 1));
+//            diff_var = findDiffVars(factor_a.getVarOfTheFactor(), factor_b.getVarOfTheFactor(), query_var_to_Join);
 //
 //
-//        // Create a list of objects to compare
-////        List<TwoMinObjectFinder.MyObject> objects = createObjectList();
+//            //find how many line this variable will add
+//            for (String var_name : diff_var) {
+//                var = this.bayesian.get(var_name);
+//                num_line *= var.getVar_outcome().size();
+//            }
+////            System.out.println(factor_a.getSize());
+////            System.out.println(factor_b.getSize());
+////            System.out.println(factor_a);
+////            System.out.println(factor_b);
+//            num_line = num_line - Math.max(factor_a.getSize(), factor_b.getSize());
 //
-//        // Find the two minimum objects in the list
-//        Factor min1 = null;
-//        Factor min2 = null;
-//        for (Factor obj : factors1) {
-//            if (min1 == null || obj.getSize() < min1.getSize()) {
-//                min2 = min1;
-//                min1 = obj;
-//            } else if (min2 == null || obj.getSize() < min2.getSize()) {
-//                min2 = obj;
-//            } else if (min1.getSize() == min2.getSize()) {
-//                // If there are multiple objects with the same size,
-//                // compare their ASCII values to find the minimum
-//                int min1AsciiSum = sumAsciiValues(min1.getVarOfTheFactor());
-//                int min2AsciiSum = sumAsciiValues(min2.getVarOfTheFactor());
-//                int objAsciiSum = sumAsciiValues(obj.getVarOfTheFactor());
-//                if (min2AsciiSum < min1AsciiSum) {
-//                    Factor temp = min1;
-//                    min1 = min2;
-//                    min2 = temp;
-//                }
-//                if (objAsciiSum < min1AsciiSum) {
-//                    min2 = min1;
-//                    min1 = obj;
-//                } else if (objAsciiSum < min2AsciiSum) {
-//                    min2 = obj;
-//                }
+//            // witch a pair of factor will add the less number of row
+//            if (num_line < min_num_line) {
+//                min_num_line = num_line;
+//            }
+//
+//            if (num_lines_and_indexes.containsKey(num_line)) {
+//                List<Integer> indexs = num_lines_and_indexes.get(num_line);
+//                indexs.add(index_factor.get(i));
+//                indexs.add(index_factor.get(i + 1));
+//            } else {
+//                index_to_put = new ArrayList<Integer>();
+//                index_to_put.add(index_factor.get(i));
+//                index_to_put.add(index_factor.get(i + 1));
+//                num_lines_and_indexes.put(num_line, index_to_put);
 //            }
 //        }
-////        // Print the two minimum objects found
-////        System.out.println("First minimum object: " + min1.getVarOfTheFactor());
-////        System.out.println("Second minimum object: " + min2.getVarOfTheFactor());
-//        List<Integer> index = new ArrayList<>();
-//        index.add(factors.indexOf(min1));
-//        index.add(factors.indexOf(min2));
-//        System.out.println(index);
+//        if (num_lines_and_indexes.get(min_num_line).size() == 2)
+//            return num_lines_and_indexes.get(min_num_line);
+//        else {
+//            int min_ascii = Integer.MAX_VALUE;
+//            ArrayList<Integer> indexes_to_return = new ArrayList<Integer>();
+//            for (int i = 0; i < num_lines_and_indexes.get(min_num_line).size() - 1; i += 2) {
+//                int sum_ascii = 0;
+//                for (String var_name : findDiffVars(factors.get(num_lines_and_indexes.get(min_num_line).get(i)).getVarOfTheFactor(),
+//                        factors.get(num_lines_and_indexes.get(min_num_line).get(i + 1)).getVarOfTheFactor(), query_var_to_Join)) {
 //
-//        return index;
+//
+//                    for (int j = 0; j < var_name.length(); j++)
+//                        sum_ascii += (int) var_name.charAt(j);
+//                }
+//                if (sum_ascii < min_ascii) {
+//                    min_ascii = sum_ascii;
+//                    indexes_to_return.clear();
+//                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i));
+//                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i + 1));
+//                }
+//            }
+//            return indexes_to_return;
+//        }
+//
+//    }
 
-        int min_num_line = Integer.MAX_VALUE;
-        List<String> diff_var;
-        List<Integer> index_to_put;
 
-        Map<Integer, List<Integer>> num_lines_and_indexes = new HashMap<Integer, List<Integer>>();
-
-        Variable var;
-
-        Factor factor_a, factor_b;
+    /**
+     * this method iterates through all pairs of factors in index_factor,
+     * calculates the number of lines that would be added by joining them,
+     * and keeps track of the pair that would add the minimum number of lines.
+     * If there is a tie for the minimum number of lines, it selects
+     * the pair with the lowest sum of ASCII values for the variables in the difference
+     * between the two factor's variables
+     *
+     * @param factors
+     * @param index_factor
+     * @param query_var_to_Join
+     * @return
+     */
+    private List<Integer> findJoin(List<Factor> factors, List<Integer> index_factor, List<String> query_var_to_Join) {
+        List<Integer> minIndexes = new ArrayList<>();
+        int minNumLines = Integer.MAX_VALUE;
 
         for (int i = 0; i < index_factor.size() - 1; i++) {
-            int num_line = 1;
-            factor_a = factors.get(index_factor.get(i));
-            factor_b = factors.get(index_factor.get(i + 1));
-            diff_var = findDiffVars(factor_a.getVarOfTheFactor(), factor_b.getVarOfTheFactor(), query_var_to_Join);
+            Factor factorA = factors.get(index_factor.get(i));
+            Factor factorB = factors.get(index_factor.get(i + 1));
+            List<String> intersect = findIntersect(factorA.getVarOfTheFactor(), factorB.getVarOfTheFactor(), query_var_to_Join);
 
-
-            //find how many line this variable will add
-            for (String var_name : diff_var) {
-                var = this.bayesian.get(var_name);
-                num_line *= var.getVar_outcome().size();
+            int numLines = 1;
+            for (String varName : intersect) {
+                Variable var = this.bayesian.get(varName);
+                numLines *= var.getVar_outcome().size();
             }
-//            System.out.println(factor_a.getSize());
-//            System.out.println(factor_b.getSize());
-//            System.out.println(factor_a);
-//            System.out.println(factor_b);
-            num_line = num_line - Math.max(factor_a.getSize(), factor_b.getSize());
+            numLines = factorA.getSize() * factorB.getSize() / numLines;
 
-            // witch a pair of factor will add the less number of row
-            if (num_line < min_num_line) {
-                min_num_line = num_line;
-            }
+            if (numLines < minNumLines) {
+                minNumLines = numLines;
+                minIndexes.clear();
+                minIndexes.add(index_factor.get(i));
+                minIndexes.add(index_factor.get(i + 1));
+            } else if (numLines == minNumLines) {
+                int sumAscii = sumAsciiValues(differences(factorA.getVarOfTheFactor(), factorB.getVarOfTheFactor(), query_var_to_Join));
 
-            if (num_lines_and_indexes.containsKey(num_line)) {
-                List<Integer> indexs = num_lines_and_indexes.get(num_line);
-                indexs.add(index_factor.get(i));
-                indexs.add(index_factor.get(i + 1));
-            } else {
-                index_to_put = new ArrayList<Integer>();
-                index_to_put.add(index_factor.get(i));
-                index_to_put.add(index_factor.get(i + 1));
-                num_lines_and_indexes.put(num_line, index_to_put);
-            }
-        }
-        if (num_lines_and_indexes.get(min_num_line).size() == 2)
-            return num_lines_and_indexes.get(min_num_line);
-        else {
-            int min_ascii = Integer.MAX_VALUE;
-            ArrayList<Integer> indexes_to_return = new ArrayList<Integer>();
-            for (int i = 0; i < num_lines_and_indexes.get(min_num_line).size() - 1; i += 2) {
-                int sum_ascii = 0;
-                for (String var_name : findDiffVars(factors.get(num_lines_and_indexes.get(min_num_line).get(i)).getVarOfTheFactor(),
-                        factors.get(num_lines_and_indexes.get(min_num_line).get(i + 1)).getVarOfTheFactor(), query_var_to_Join)) {
-                    for (int j = 0; j < var_name.length(); j++)
-                        sum_ascii += (int) var_name.charAt(j);
+                int minAscii = 0;
+                for (String varName : differences(factors.get(minIndexes.get(0)).getVarOfTheFactor(),
+                        factors.get(minIndexes.get(1)).getVarOfTheFactor(), query_var_to_Join)) {
+                    for (int j = 0; j < varName.length(); j++) {
+                        minAscii += (int) varName.charAt(j);
+                    }
                 }
-                if (sum_ascii < min_ascii) {
-                    min_ascii = sum_ascii;
-                    indexes_to_return.clear();
-                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i));
-                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i + 1));
+
+                if (sumAscii < minAscii) {
+                    minIndexes.clear();
+                    minIndexes.add(index_factor.get(i));
+                    minIndexes.add(index_factor.get(i + 1));
                 }
             }
-            return indexes_to_return;
         }
 
+        return minIndexes;
     }
 
 
-    private List<String> findDiffVars(List<String> vars_name_a, List<String> vars_name_b, List<String> query_vars) {
-        List<String> diff_vars = new ArrayList<String>();
-        for (String var_name : vars_name_a) {
-            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
-                diff_vars.add(var_name);
+    /**
+     * Helper function that finds the intersection of two lists of strings.
+     * It takes in two lists listA and listB, and a third list queryVarsToJoin,
+     * and returns a new list containing only the elements that are present in both listA and listB.
+     */
+    private List<String> findIntersect(List<String> listA, List<String> listB, List<String> queryVarsToJoin) {
+        List<String> intersect = new ArrayList<>();
+        for (String element : listA) {
+            if (listB.contains(element) && queryVarsToJoin.contains(element)) {
+                intersect.add(element);
+            }
         }
-        for (String var_name : vars_name_b) {
-            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
-                diff_vars.add(var_name);
-        }
-        return diff_vars;
-
+        return intersect;
     }
 
-    // Returns the sum of the ASCII values of the given string
+    /**
+     * in order to calculate the sum of ASCII values
+     * This function iterates through both listA and listB,
+     * and adds elements to the diff list if they are not present in the other
+     * list and are present in queryVarsToJoin. At the end, it returns the diff list.
+     * it is used to find the difference between the two lists of variables
+     *
+     * @param listA
+     * @param listB
+     * @param queryVarsToJoin
+     * @return
+     */
+    private List<String> differences(List<String> listA, List<String> listB, List<String> queryVarsToJoin) {
+        List<String> diff = new ArrayList<>();
+        for (String element : listA) {
+            if (!listB.contains(element) && queryVarsToJoin.contains(element)) {
+                diff.add(element);
+            }
+
+        }
+        for (String element : listB) {
+            if (!listA.contains(element) && queryVarsToJoin.contains(element)) {
+                diff.add(element);
+            }
+        }
+        return diff;
+    }
+
+
+//    private List<String> findDiffVars(List<String> vars_name_a, List<String> vars_name_b, List<String> query_vars) {
+//        List<String> diff_vars = new ArrayList<String>();
+//        for (String var_name : vars_name_a) {
+//            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
+//                diff_vars.add(var_name);
+//        }
+//        for (String var_name : vars_name_b) {
+//            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
+//                diff_vars.add(var_name);
+//        }
+//        return diff_vars;
+//
+//    }
+
+    /**
+     * @return the sum of the ASCII values of the given string
+     */
     private static int sumAsciiValues(List<String> varNameList) {
         int sum = 0;
         for (int i = 0; i < varNameList.size(); i++) {
@@ -669,18 +747,37 @@ public class Network {
 
 
     /**
-     * This method checks if a variable is an ancestor of query or evidence variables.
+     * his method checks if a variable is an ancestor of query or evidence variables
+     * using (BFS) algorithm.
      */
-    private boolean ancestor(String name, List<String> parents) {
-        if (parents.isEmpty()) return false;
-        if (parents.contains(name)) return true;
-        for (String var : parents) {
-            if (ancestor(name, bayesian.get(var).getParentsName()))
+
+    private boolean isAncestor(String name, List<String> parents) {
+
+        Queue<String> queue = new LinkedList<>();
+        queue.addAll(parents);
+        while (!queue.isEmpty()) {
+            String var = queue.poll();
+            // If the name variable is found in any of the parent lists,
+            if (var.equals(name)) {
                 return true;
+            }
+            queue.addAll(bayesian.get(var).getParentsName());
         }
+
         return false;
-
-
     }
+
+
+//    private boolean isAncestor(String name, List<String> parents) {
+//        if (parents.isEmpty()) return false;
+//        if (parents.contains(name)) return true;
+//        for (String var : parents) {
+//            if (isAncestor(name, bayesian.get(var).getParentsName()))
+//                return true;
+//        }
+//        return false;
+//
+//
+//    }
 
 }

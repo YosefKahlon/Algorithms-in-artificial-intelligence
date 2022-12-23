@@ -145,6 +145,7 @@ public class XmlReader {
         //create CPT for each variable
         varMap.forEach((key, value) -> {
             varMap.get(key).CreateCPT();
+            System.out.println(value);
         });
 
 

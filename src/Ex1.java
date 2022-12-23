@@ -9,19 +9,19 @@ import java.util.*;
 
 public class Ex1 {
 
-    private static String input = "input7.txt";
+    private static String input = "input.txt";
     private static String output = "output3.txt";
 
     public static void main(String[] args) {
 
         /**
-         * 1. read the input
-         *  1.2. open the xml from the first line
+         * 1. read the input.txt
+         *  1.2. open the XML from the first line
          *  1.3. build the variable
          *  1.4 get the queries and algorithm
          * 2. build the network
          * 3. make the query
-         *  3.1. add to output the result
+         *  3.1. write result to output.txt
          */
 
         int line_counter = 0;
@@ -63,7 +63,7 @@ public class Ex1 {
         Network bayesian = new Network(variableList);
 
         //print the network
-        bayesian.printNetwork();
+        //bayesian.printNetwork();
 
 
         //write to the output file the result
@@ -90,7 +90,7 @@ public class Ex1 {
                     case ("3"):
                         break;
                 }
-                //break;
+
 
 
             }

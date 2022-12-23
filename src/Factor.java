@@ -16,19 +16,6 @@ public class Factor {
 
     }
 
-    public Map<List<String>, Map<List<String>, Double>> getFactor() {
-        return factor;
-    }
-
-    public void toFactor(Variable var, List<String> evidence, List<String> evidence_outcome) {
-        this.varOfTheFactor.addAll(var.getParentsName());
-        this.varOfTheFactor.add(var.getName());
-
-        //todo
-        this.factor.put(this.varOfTheFactor, var.getCptLines(evidence, evidence_outcome));
-        //System.out.println(this.factor);
-    }
-
     public List<String> getVarOfTheFactor() {
         return varOfTheFactor;
     }
@@ -42,6 +29,35 @@ public class Factor {
         return factor.get(this.varOfTheFactor).size();
     }
 
+    public Map<List<String>, Map<List<String>, Double>> getFactor() {
+        return factor;
+    }
+
+    public int getMulti_counter() {
+        return multi_counter;
+    }
+
+    public void add_Multi(int multi_counter) {
+        this.multi_counter += multi_counter;
+    }
+
+    public int getPlus_counter() {
+        return plus_counter;
+    }
+
+    public void add_Plus(int plus_counter) {
+        this.plus_counter += plus_counter;
+    }
+
+
+    public void toFactor(Variable var, List<String> evidence, List<String> evidence_outcome) {
+        this.varOfTheFactor.addAll(var.getParentsName());
+        this.varOfTheFactor.add(var.getName());
+
+        //todo
+        this.factor.put(this.varOfTheFactor, var.getCptLines(evidence, evidence_outcome));
+        //System.out.println(this.factor);
+    }
 
 
     public Factor join(Factor factor) {
@@ -91,11 +107,11 @@ public class Factor {
 
                 boolean bool = true;
 
-             //   System.out.println(varIndex);
+                //   System.out.println(varIndex);
                 for(int k : varIndex.keySet()){
-                 //   System.out.println(k);
-                   // System.out.println(a.get(k));
-                   // System.out.println(b.get(varIndex.get(k)));
+                    //   System.out.println(k);
+                    // System.out.println(a.get(k));
+                    // System.out.println(b.get(varIndex.get(k)));
                     if (!a.get(k).equals(b.get(varIndex.get(k)))) {
                         bool = false;
                         break;
@@ -132,37 +148,15 @@ public class Factor {
         return result;
     }
 
-
-    private void setParameter(List<String> resultFactorVar, Map<List<String>, Double> probability) {
-        this.factor.put(resultFactorVar, probability);
-        this.varOfTheFactor = resultFactorVar;
-    }
-
-    public int getMulti_counter() {
-        return multi_counter;
-    }
-
-    public void add_Multi(int multi_counter) {
-        this.multi_counter += multi_counter;
-    }
-
-    public int getPlus_counter() {
-        return plus_counter;
-    }
-
-    public void add_Plus(int plus_counter) {
-        this.plus_counter += plus_counter;
-    }
-
     public void elimination(String hidden_var) {
 
-       // System.out.println(this.factor);
+        // System.out.println(this.factor);
         Set<List<String>> set = this.factor.keySet();
         List<List<String>> first_list = new ArrayList<>(set);
         // System.out.println(first_list);
         Set<List<String>> set1 = this.factor.get(first_list.get(0)).keySet();
         List<List<String>> outcome_this_factor = new ArrayList<>(set1);
-       // System.out.println(outcome_this_factor);
+        // System.out.println(outcome_this_factor);
 
         int plus_counter = 0;
         Map<List<String>, Double> probability = new HashMap<>();
@@ -171,7 +165,7 @@ public class Factor {
 
         for (int i = 0; i < outcome_this_factor.size(); i++) {
             temp = new ArrayList<>(outcome_this_factor.get(i));
-          //  System.out.println(temp);
+            //  System.out.println(temp);
             temp.remove(this.varOfTheFactor.indexOf(hidden_var));
             if (probability.containsKey(temp)) {
                 probability.replace(temp, probability.get(temp),
@@ -187,16 +181,20 @@ public class Factor {
 
 
         this.add_Plus(plus_counter);
-      //  System.out.println("elimination");
+        //  System.out.println("elimination");
 //        result.add_Plus(getPlus_counter());
 //        result.add_Multi(getMulti_counter());
 
 
-      //  System.out.println("plus "+ plus_counter);
+        //  System.out.println("plus "+ plus_counter);
         this.varOfTheFactor.remove(hidden_var);
         setParameter(this.varOfTheFactor, probability);
 
     }
 
+    private void setParameter(List<String> resultFactorVar, Map<List<String>, Double> probability) {
+        this.factor.put(resultFactorVar, probability);
+        this.varOfTheFactor = resultFactorVar;
+    }
 
 }

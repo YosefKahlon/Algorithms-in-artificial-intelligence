@@ -340,9 +340,9 @@ public class Network {
         var_query.add(first_var[0]);
         var_outcome.add(first_var[1]);
 
-
-        String evidence_validation = first_var[1];
-        if (evidence_validation.length() > 1) {
+//
+        System.out.println(query);
+        if (query.contains("|")) {
             // the evidence variables
             String[] evidence = var_and_val[1].split(",");
             String[] evi_;

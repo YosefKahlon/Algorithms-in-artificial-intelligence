@@ -1,6 +1,5 @@
 net7.xml
 P(A=T|E=two,F=two),1
-P(A=T|E=two,F=two),2
 P(A=F|B=T,C=F,D=T),1
 P(A=F|B=T,C=F,D=T),2
 P(G=one|B=T,I=ken),1

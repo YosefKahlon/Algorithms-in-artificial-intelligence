@@ -72,7 +72,7 @@ public class Ex1 {
             FileWriter myWriter = new FileWriter(output);
 
             while (!queries.isEmpty()) {
-              //  System.out.println(queries.peek());
+                System.out.println(queries.peek());
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");

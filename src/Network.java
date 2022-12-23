@@ -49,7 +49,6 @@ public class Network {
         //the outcomes of the query variables}
         List<List<String>> queryParameter = getParameter(query);
 
-        //check if there is a direct answer from the data todo
         if (hasAnswer(queryParameter)) {
             return directAns(queryParameter);
 
@@ -220,48 +219,6 @@ public class Network {
     }
 
 
-//    /**
-//     * In this method we search for the probabilistic value, by search the indexes
-//     * of the variable parents and get the outcomes we need from the input of the function.
-//     * @return The probabilistic value.
-//     */
-//    private double getProbability(String var, String varOutcome, List<String> VarList, List<String> outcomeList) {
-//
-//        //System.out.println(var);
-//
-//
-//        if (bayesian.get(var).getVar_parents().isEmpty()) {
-//
-//            return this.bayesian.get(var).getCptMap().get(null).get(varOutcome);
-//        }
-//
-//        else {
-//            //search the index of the parent, so we can find witch outcome value need to take.
-//            int[] parentsIndex = new int[this.bayesian.get(var).getVar_parents().size()];
-//           // List<String> name = new ArrayList<>();
-//            int j = 0;
-//
-//            for (int i = 0; i < VarList.size(); i++) {
-//                if (this.bayesian.get(var).getParentsName().contains(VarList.get(i))) {
-//                    parentsIndex[this.bayesian.get(var).getVar_parents().indexOf(this.bayesian.get(VarList.get(i)))
-//                            ] = i;
-//                   // name.add(VarList.get(i));
-//                    j++;
-//                    //}
-//                    if (j >= parentsIndex.length) break;
-//                }
-//
-//            }
-//
-//            List<String> outcome = new ArrayList<>();
-//            for (int i = 0; i < this.bayesian.get(var).getVar_parents().size(); i++) {
-//                outcome.add(outcomeList.get(parentsIndex[i]));
-//            }
-//
-//            return this.bayesian.get(var).getCptMap().get(outcome).get(varOutcome);
-//
-//        }
-//    }
 
     /**
      * In this method we search for the probabilistic value, by search the indexes
@@ -305,30 +262,64 @@ public class Network {
      * @param queryParameter
      * @return boolean
      */
+
+
     private boolean hasAnswer(List<List<String>> queryParameter) {
-
-
-        // if it is a variable we don't know
-        for (int i = 0; i < queryParameter.get(0).size(); i++) {
-            String var = queryParameter.get(0).get(i);
-            if (!this.bayesian.containsKey(var)) {
-                return false;
-            }
-        }
-
-        //if the query contains all the parents, so we can get directly  from the CPT
-        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size() - 1) {
+        // Check if the query is empty
+        if (queryParameter == null || queryParameter.isEmpty() || queryParameter.get(0).isEmpty()) {
             return false;
         }
 
+        String variable = queryParameter.get(0).get(0);
+        // Check if the variable exists in the Bayesian network
+        if (!this.bayesian.containsKey(variable)) {
+            return false;
+        }
+
+        // Check if the query contains all the parents of the variable
+        List<Variable> parents = this.bayesian.get(variable).getVar_parents();
+        if (parents.size() != queryParameter.get(0).size() - 1) {
+            return false;
+        }
         for (int i = 1; i < queryParameter.get(0).size(); i++) {
-            if (!this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().toString().contains(queryParameter.get(0).get(i))) {
+            boolean found = false;
+            for (Variable parent : parents) {
+                if (parent.getName().equals(queryParameter.get(0).get(i))) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
                 return false;
             }
         }
 
         return true;
     }
+//    private boolean hasAnswer(List<List<String>> queryParameter) {
+//
+//
+//        // if it is a variable we don't know
+//        for (int i = 0; i < queryParameter.get(0).size(); i++) {
+//            String var = queryParameter.get(0).get(i);
+//            if (!this.bayesian.containsKey(var)) {
+//                return false;
+//            }
+//        }
+//
+//        //if the query contains all the parents, so we can get directly  from the CPT
+//        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size() - 1) {
+//            return false;
+//        }
+//
+//        for (int i = 1; i < queryParameter.get(0).size(); i++) {
+//            if (!this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().toString().contains(queryParameter.get(0).get(i))) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 
 
     /**
@@ -337,7 +328,6 @@ public class Network {
      * query variable order at the same index as in the variable list.
      */
     private List<List<String>> getParameter(String query) {
-
         List<String> var_query = new ArrayList<>();
         List<String> var_outcome = new ArrayList<>();
 
@@ -348,20 +338,25 @@ public class Network {
         var_query.add(first_var[0]);
         var_outcome.add(first_var[1]);
 
-        // the evidence variables
-        String[] evidence = var_and_val[1].split(",");
-        String[] evi_;
-        for (int i = 0; i < evidence.length; i++) {
-            evi_ = evidence[i].split("=");
-            var_query.add(evi_[0]);
-            var_outcome.add(evi_[1]);
-        }
 
+        String evidence_validation = first_var[1];
+        if (evidence_validation.length() > 1) {
+            // the evidence variables
+            String[] evidence = var_and_val[1].split(",");
+            String[] evi_;
+            for (int i = 0; i < evidence.length; i++) {
+                evi_ = evidence[i].split("=");
+                var_query.add(evi_[0]);
+                var_outcome.add(evi_[1]);
+            }
+        }
         List<List<String>> parameter = new ArrayList<>();
         parameter.add(var_query);
         parameter.add(var_outcome);
         return parameter;
+
     }
+
 
     /**
      * @param queryParameter
@@ -383,16 +378,22 @@ public class Network {
     }
 
 
+    /**
+     * This algorithm answers a more efficient query than the simple inference algo,
+     * Since this involves eliminating variables from the model that are not relevant to the query or the evidence,
+     * and replacing them with new factors that represent the dependence between the remaining variables.
+     * @param query
+     * @return The probabilistic value in the required format.
+     */
     public String VariableElimination(String query) {
 
         //{variable of the query ,
         //the outcomes of the query variables}
         List<List<String>> queryParameter = getParameter(query);
 
-        //check if there is a direct answer from the data todo
+        //check if there is a direct answer from the data
         if (hasAnswer(queryParameter)) {
             return directAns(queryParameter);
-
         }
 
 
@@ -425,9 +426,16 @@ public class Network {
 
     }
 
-
+    /**
+     * the steps for this algorithm:
+     * Create factors for the evidence variables in the model.
+     * Join the factors according to the hidden variables in the model.
+     * Eliminate the factors according to the hidden variables, one by one, until there are no more hidden variables.
+     * Join the remaining factors and eliminate the factors according to the query variable.
+     * Normalize the final result to obtain the probability of the query variable given the evidence.
+     */
     private String VariableElimination(List<String> evidence, List<String> evidence_outcome, List<String> hidden_list, List<String> varList) {
-
+        String ans= "";
         List<String> query_var = new ArrayList<>();
 
         String var = evidence.get(0);
@@ -509,112 +517,40 @@ public class Network {
         }
 
         // get the number of multiply and sum operations
-        int multi_counter = 0, Plus_counter = 0;
+        int multi_counter = 0, plus_counter = 0;
         multi_counter += factors.get(0).getMulti_counter();
-        Plus_counter += factors.get(0).getPlus_counter();
-
-
-        int index_var = factors.get(0).getVarOfTheFactor().indexOf(var);
-
+        plus_counter += factors.get(0).getPlus_counter();
         double prob = 0, sum = -1;
-
+        int var_index = factors.get(0).getVarOfTheFactor().indexOf(var);
 
         Set<List<String>> set = factors.get(0).getFactor().keySet();
         List<List<String>> first_list = new ArrayList<>(set);
 
         Set<List<String>> set1 = factors.get(0).getFactor().get(first_list.get(0)).keySet();
         List<List<String>> outcome_this_factor = new ArrayList<>(set1);
-        List<String> temp = new ArrayList<>();
-        for (List<String> strings : outcome_this_factor) {
-            temp = new ArrayList<>(strings);
+        List<String> outcome = new ArrayList<>();
+
+        //normalization of the probability
+        for (List<String> i : outcome_this_factor) {
+            outcome = new ArrayList<>(i);
             if (sum == -1) {
-                sum = factors.get(0).getFactor().get(first_list.get(0)).get(temp);
+                sum = factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
             } else {
-                sum += factors.get(0).getFactor().get(first_list.get(0)).get(temp);
-                Plus_counter++;
+                sum += factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
+                plus_counter++;
             }
-            if (temp.get(index_var).equals(outcome_var)) {
-                prob = factors.get(0).getFactor().get(first_list.get(0)).get(temp);
+            if (outcome.get(var_index).equals(outcome_var)) {
+                prob = factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
             }
 
         }
 
-        return "" + new DecimalFormat("0.00000").format(prob / sum) + "," + Plus_counter + "," + multi_counter + "\n";
+        DecimalFormat df = new DecimalFormat("0.00000");
+        String formatted = df.format(prob / sum);
 
-
+        ans += formatted + "," + plus_counter + "," + multi_counter + "\n";
+        return ans;
     }
-//
-//    private List<Integer> findJoin(List<Factor> factors, List<Integer> index_factor, List<String> query_var_to_Join) {
-//
-//        int min_num_line = Integer.MAX_VALUE;
-//        List<String> diff_var;
-//        List<Integer> index_to_put;
-//
-//        Map<Integer, List<Integer>> num_lines_and_indexes = new HashMap<Integer, List<Integer>>();
-//
-//        Variable var;
-//
-//        Factor factor_a, factor_b;
-//
-//        for (int i = 0; i < index_factor.size() - 1; i++) {
-//            int num_line = 1;
-//            factor_a = factors.get(index_factor.get(i));
-//            factor_b = factors.get(index_factor.get(i + 1));
-//            diff_var = findDiffVars(factor_a.getVarOfTheFactor(), factor_b.getVarOfTheFactor(), query_var_to_Join);
-//
-//
-//            //find how many line this variable will add
-//            for (String var_name : diff_var) {
-//                var = this.bayesian.get(var_name);
-//                num_line *= var.getVar_outcome().size();
-//            }
-////            System.out.println(factor_a.getSize());
-////            System.out.println(factor_b.getSize());
-////            System.out.println(factor_a);
-////            System.out.println(factor_b);
-//            num_line = num_line - Math.max(factor_a.getSize(), factor_b.getSize());
-//
-//            // witch a pair of factor will add the less number of row
-//            if (num_line < min_num_line) {
-//                min_num_line = num_line;
-//            }
-//
-//            if (num_lines_and_indexes.containsKey(num_line)) {
-//                List<Integer> indexs = num_lines_and_indexes.get(num_line);
-//                indexs.add(index_factor.get(i));
-//                indexs.add(index_factor.get(i + 1));
-//            } else {
-//                index_to_put = new ArrayList<Integer>();
-//                index_to_put.add(index_factor.get(i));
-//                index_to_put.add(index_factor.get(i + 1));
-//                num_lines_and_indexes.put(num_line, index_to_put);
-//            }
-//        }
-//        if (num_lines_and_indexes.get(min_num_line).size() == 2)
-//            return num_lines_and_indexes.get(min_num_line);
-//        else {
-//            int min_ascii = Integer.MAX_VALUE;
-//            ArrayList<Integer> indexes_to_return = new ArrayList<Integer>();
-//            for (int i = 0; i < num_lines_and_indexes.get(min_num_line).size() - 1; i += 2) {
-//                int sum_ascii = 0;
-//                for (String var_name : findDiffVars(factors.get(num_lines_and_indexes.get(min_num_line).get(i)).getVarOfTheFactor(),
-//                        factors.get(num_lines_and_indexes.get(min_num_line).get(i + 1)).getVarOfTheFactor(), query_var_to_Join)) {
-//
-//
-//                    for (int j = 0; j < var_name.length(); j++)
-//                        sum_ascii += (int) var_name.charAt(j);
-//                }
-//                if (sum_ascii < min_ascii) {
-//                    min_ascii = sum_ascii;
-//                    indexes_to_return.clear();
-//                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i));
-//                    indexes_to_return.add(num_lines_and_indexes.get(min_num_line).get(i + 1));
-//                }
-//            }
-//            return indexes_to_return;
-//        }
-//
-//    }
 
 
     /**
@@ -718,20 +654,6 @@ public class Network {
     }
 
 
-//    private List<String> findDiffVars(List<String> vars_name_a, List<String> vars_name_b, List<String> query_vars) {
-//        List<String> diff_vars = new ArrayList<String>();
-//        for (String var_name : vars_name_a) {
-//            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
-//                diff_vars.add(var_name);
-//        }
-//        for (String var_name : vars_name_b) {
-//            if ((!query_vars.contains(var_name) || query_vars.get(0).equals(var_name)) && !diff_vars.contains(var_name))
-//                diff_vars.add(var_name);
-//        }
-//        return diff_vars;
-//
-//    }
-
     /**
      * @return the sum of the ASCII values of the given string
      */
@@ -750,7 +672,6 @@ public class Network {
      * his method checks if a variable is an ancestor of query or evidence variables
      * using (BFS) algorithm.
      */
-
     private boolean isAncestor(String name, List<String> parents) {
 
         Queue<String> queue = new LinkedList<>();
@@ -767,17 +688,5 @@ public class Network {
         return false;
     }
 
-
-//    private boolean isAncestor(String name, List<String> parents) {
-//        if (parents.isEmpty()) return false;
-//        if (parents.contains(name)) return true;
-//        for (String var : parents) {
-//            if (isAncestor(name, bayesian.get(var).getParentsName()))
-//                return true;
-//        }
-//        return false;
-//
-//
-//    }
 
 }

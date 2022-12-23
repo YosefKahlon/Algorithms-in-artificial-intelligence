@@ -121,7 +121,7 @@ public class XmlReader {
 
                             break;
 
-                        //cpt
+                        //CPT
                         case "TABLE":
                             NodeList cpt_value = childNode.getChildNodes();
                             String s1 = cpt_value.item(0).getTextContent();
@@ -145,7 +145,7 @@ public class XmlReader {
         //create CPT for each variable
         varMap.forEach((key, value) -> {
             varMap.get(key).CreateCPT();
-            System.out.println(value);
+            //System.out.println(value);
         });
 
 

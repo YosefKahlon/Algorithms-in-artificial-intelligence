@@ -9,8 +9,8 @@ import java.util.*;
 
 public class Ex1 {
 
-    private static String input = "input.txt";
-    private static String output = "output3.txt";
+    private static String input = "input8.txt";
+    private static String output = "output8.txt";
 
     public static void main(String[] args) {
 
@@ -63,7 +63,7 @@ public class Ex1 {
         Network bayesian = new Network(variableList);
 
         //print the network
-        //bayesian.printNetwork();
+       // bayesian.printNetwork();
 
 
         //write to the output file the result
@@ -71,16 +71,16 @@ public class Ex1 {
             FileWriter myWriter = new FileWriter(output);
 
             while (!queries.isEmpty()) {
-                //System.out.println(queries.peek());
+              //  System.out.println(queries.peek());
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");
-              //  System.out.println(p_queries[1]);
+                //System.out.println(p_queries[1]);
 
 
                 switch (algo_num[1]) {
                     case ("1"):
-                       // System.out.println(bayesian.simpleDeduction(p_queries[1]));
+                       // System.out.println(bayesian.simpleInference(p_queries[1]));
                         myWriter.write(bayesian.simpleInference(p_queries[1]));
                         break;
                     case ("2"):

@@ -1,5 +1,12 @@
 import java.util.*;
 
+/**
+ * This class represents a factor.
+ * A factor is a function that attaches a probability value
+ * to every possible combination of the names of the factor's variables.
+ */
+
+
 public class Factor {
 
     private Map<List<String>, Map<List<String>, Double>> factor;
@@ -50,16 +57,19 @@ public class Factor {
     }
 
 
+    /**
+     * This method takes the variable and the evidence variables and their outcome and converts it to a factor
+     */
     public void toFactor(Variable var, List<String> evidence, List<String> evidence_outcome) {
         this.varOfTheFactor.addAll(var.getParentsName());
         this.varOfTheFactor.add(var.getName());
-
-        //todo
         this.factor.put(this.varOfTheFactor, var.getCptLines(evidence, evidence_outcome));
-        //System.out.println(this.factor);
+
     }
 
-
+    /**
+     * This method build a new factor over the union of the variables
+     */
     public Factor join(Factor factor) {
 
         Factor result = new Factor();
@@ -136,7 +146,6 @@ public class Factor {
 
         }
         result.setParameter(resultFactorVar, probability);
-        //result.factor.put(resultFactorVar, probability);
         add_Multi(multi_counter);
         add_Multi(factor.getMulti_counter());
 
@@ -148,15 +157,18 @@ public class Factor {
         return result;
     }
 
+    /**
+     * This method takes a factor and sum out a variable to delete - marginalization.
+     *
+     * -- Shrinks a factor to a smaller one --
+     */
     public void elimination(String hidden_var) {
-
-        // System.out.println(this.factor);
         Set<List<String>> set = this.factor.keySet();
         List<List<String>> first_list = new ArrayList<>(set);
-        // System.out.println(first_list);
+
         Set<List<String>> set1 = this.factor.get(first_list.get(0)).keySet();
         List<List<String>> outcome_this_factor = new ArrayList<>(set1);
-        // System.out.println(outcome_this_factor);
+
 
         int plus_counter = 0;
         Map<List<String>, Double> probability = new HashMap<>();
@@ -165,33 +177,37 @@ public class Factor {
 
         for (int i = 0; i < outcome_this_factor.size(); i++) {
             temp = new ArrayList<>(outcome_this_factor.get(i));
-            //  System.out.println(temp);
+
+            // get list of outcome without the value of the hidden variable to create the new line of the factor
             temp.remove(this.varOfTheFactor.indexOf(hidden_var));
+
+
             if (probability.containsKey(temp)) {
+                //if two line have the same outcome sum them into one
                 probability.replace(temp, probability.get(temp),
                         probability.get(temp) + this.factor.get(first_list.get(0)).get(outcome_this_factor.get(i)));
                 plus_counter++;
             } else {
                 probability.put(temp,
                         this.factor.get(first_list.get(0)).get(outcome_this_factor.get(i)));
-                // System.out.println(probability);
+
             }
         }
-        //System.out.println(probability);
+
+
 
 
         this.add_Plus(plus_counter);
-        //  System.out.println("elimination");
-//        result.add_Plus(getPlus_counter());
-//        result.add_Multi(getMulti_counter());
-
-
-        //  System.out.println("plus "+ plus_counter);
         this.varOfTheFactor.remove(hidden_var);
+
+        // new factor new value
         setParameter(this.varOfTheFactor, probability);
 
     }
 
+    /**
+     * This method set the parameters of the factor after doing elimination and join algorithms.
+     */
     private void setParameter(List<String> resultFactorVar, Map<List<String>, Double> probability) {
         this.factor.put(resultFactorVar, probability);
         this.varOfTheFactor = resultFactorVar;

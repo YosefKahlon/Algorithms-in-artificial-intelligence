@@ -465,7 +465,7 @@ public class Network {
 
 
         List<Integer> index_join = new ArrayList<>();
-        List<String> query_var_to_Join = new ArrayList<>(); //todo delete
+        List<String> query_var_to_Join = new ArrayList<>();
         query_var_to_Join.add(var);
         query_var_to_Join.addAll(evidence);
 

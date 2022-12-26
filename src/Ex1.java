@@ -12,7 +12,7 @@ import java.util.*;
 /**
  *
  * ID: 209011840
- * 
+ *
  */
 
 
@@ -21,7 +21,7 @@ import java.util.*;
 public class Ex1 {
 
     private static String input = "input.txt";
-    private static String output = "filename.txt";
+    private static String output = "output.txt";
 
     public static void main(String[] args) {
 
@@ -100,7 +100,8 @@ public class Ex1 {
                        // System.out.println(bayesian.VariableElimination(p_queries[1]));
                         break;
                     case ("3"):
-                        break;
+                        //I didn't do it
+                        myWriter.write( bayesian.VariableElimination(p_queries[1]));
                 }
 
 

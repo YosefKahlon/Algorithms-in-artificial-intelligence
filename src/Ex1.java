@@ -1,4 +1,4 @@
-import com.sun.xml.internal.txw2.Document;
+//import com.sun.xml.internal.txw2.Document;
 
 
 import java.io.File;  // Import the File class
@@ -20,7 +20,7 @@ import java.util.*;
 
 public class Ex1 {
 
-    private static String input = "input8.txt";
+    private static String input = "input.txt";
     private static String output = "output.txt";
 
     public static void main(String[] args) {

@@ -128,7 +128,7 @@ public class Network {
                         //start a new inner query P(B=T,J=T,M=T,A=T,E=T)
                         //so also start to multiply from here
                         if (startInnerQuery) {
-                            sumOfInnerQuery = getProbability( //todo
+                            sumOfInnerQuery = getProbability(
                                     all_var.get(k),
                                     all_outcome.get(k),
                                     all_var, all_outcome);
@@ -296,30 +296,7 @@ public class Network {
 
         return true;
     }
-//    private boolean hasAnswer(List<List<String>> queryParameter) {
-//
-//
-//        // if it is a variable we don't know
-//        for (int i = 0; i < queryParameter.get(0).size(); i++) {
-//            String var = queryParameter.get(0).get(i);
-//            if (!this.bayesian.containsKey(var)) {
-//                return false;
-//            }
-//        }
-//
-//        //if the query contains all the parents, so we can get directly  from the CPT
-//        if (this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().size() != queryParameter.get(0).size() - 1) {
-//            return false;
-//        }
-//
-//        for (int i = 1; i < queryParameter.get(0).size(); i++) {
-//            if (!this.bayesian.get(queryParameter.get(0).get(0)).getVar_parents().toString().contains(queryParameter.get(0).get(i))) {
-//                return false;
-//            }
-//        }
-//
-//        return true;
-//    }
+
 
 
     /**
@@ -521,7 +498,7 @@ public class Network {
         int multi_counter = 0, plus_counter = 0;
         multi_counter += factors.get(0).getMulti_counter();
         plus_counter += factors.get(0).getPlus_counter();
-        double prob = 0, sum = -1;
+        double probability = 0, sum =0;
         int var_index = factors.get(0).getVarOfTheFactor().indexOf(var);
 
         Set<List<String>> set = factors.get(0).getFactor().keySet();
@@ -542,13 +519,13 @@ public class Network {
                 plus_counter++;
             }
             if (outcome.get(var_index).equals(outcome_var)) {
-                prob = factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
+                probability = factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
             }
 
         }
 
         DecimalFormat df = new DecimalFormat("0.00000");
-        String formatted = df.format(prob / sum);
+        String formatted = df.format(probability / sum);
 
         ans += formatted + "," + plus_counter + "," + multi_counter + "\n";
         return ans;

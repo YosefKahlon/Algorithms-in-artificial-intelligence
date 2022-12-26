@@ -1,7 +1,0 @@
-net5.xml
-P(G=low|B=F,H=F,F=always),1
-P(G=low|B=F,H=F,F=always),2
-P(B=T|F=never,G=medium),1
-P(B=T|F=never,G=medium),2
-P(G=low|B=F,H=F),1
-P(G=low|B=F,H=F),2

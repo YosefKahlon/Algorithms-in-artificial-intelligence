@@ -8,6 +8,16 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
+
+/**
+ *
+ * ID: 209011840
+ * 
+ */
+
+
+
+
 public class Ex1 {
 
     private static String input = "input.txt";
@@ -72,20 +82,13 @@ public class Ex1 {
             FileWriter myWriter = new FileWriter(output);
 
             while (!queries.isEmpty()) {
-                System.out.println(queries.peek());
+               // System.out.println(queries.peek());
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");
                // System.out.println(Arrays.toString(p_queries));
 
-                //empty query
-//                if (p_queries.length < 2){
-//                    String ans= "";
-//                    String formatted = "0.00000";
-//                    ans += formatted + ",0,0\n";
-//                    myWriter.write(ans);
-//                    continue;
-//                }
+
 
                 switch (algo_num[1]) {
                     case ("1"):

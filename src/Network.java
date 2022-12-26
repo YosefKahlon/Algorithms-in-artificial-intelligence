@@ -515,7 +515,6 @@ public class Network {
         for (int i = 0; i < factors.size() - 1; i++) {
             factors.set(0, factors.get(0).join(factors.get(1)));
             factors.remove(1);
-
         }
 
         // get the number of multiply and sum operations
@@ -531,12 +530,13 @@ public class Network {
         Set<List<String>> set1 = factors.get(0).getFactor().get(first_list.get(0)).keySet();
         List<List<String>> outcome_this_factor = new ArrayList<>(set1);
         List<String> outcome = new ArrayList<>();
-
+        boolean bool = true;
         //normalization of the probability
         for (List<String> i : outcome_this_factor) {
             outcome = new ArrayList<>(i);
-            if (sum == -1) {
+            if (bool) {
                 sum = factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
+                bool = false;
             } else {
                 sum += factors.get(0).getFactor().get(first_list.get(0)).get(outcome);
                 plus_counter++;

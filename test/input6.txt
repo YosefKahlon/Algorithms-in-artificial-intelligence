@@ -1,0 +1,7 @@
+net6.xml
+P(B=noset|A=T),1
+P(B=noset|A=T),2
+P(A=F|C=stay),1
+P(A=F|C=stay),2
+P(C=stay|B=set,A=F),1
+P(C=stay|B=set,A=F),2

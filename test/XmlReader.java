@@ -46,7 +46,7 @@ public class XmlReader {
      */
     public List<Variable> getVar(Document doc) {
 
-        Map<String, Variable> varMap = new HashMap<>();
+        HashMap<String, Variable> varMap = new HashMap<>();
 
         // Read the tag VARIABLE from the xml
         NodeList varList = doc.getElementsByTagName("VARIABLE");
@@ -132,7 +132,7 @@ public class XmlReader {
 
                             //get the value
                             for (String s : temp_list) {
-                                double val = Double.parseDouble(s);
+                                double val = new Double(s);
                                 varMap.get(name).getVar_cpt().add(val);
                             }
 

@@ -182,11 +182,10 @@ public class Network {
 
 
     /**
-     * This method returns all possible combinations
-     * to create a truth table for the possible values of each variable and its parents.
+     * Truth table:
      *
-     * @param lists of list of outcome
-     * @return all possible combinations.
+     * @param lists is list of list
+     * @return all the combinations from values of the lists
      */
     private static List<List<String>> getAllCombinations(List<List<String>> lists) {
         List<List<String>> combinations = new ArrayList<>();
@@ -442,7 +441,6 @@ public class Network {
         }
 
 
-
         List<Integer> index_join = new ArrayList<>();
         List<String> query_var_to_Join = new ArrayList<>();
         query_var_to_Join.add(var);
@@ -450,7 +448,7 @@ public class Network {
 
 
         // While loop, as long as there is a Hidden variable we will execute:
-        // 1. A variable h belongs Hidden is chosen.
+        // 1. A variable 𝐻∈𝐻𝑖𝑑𝑑𝑒𝑛 is chosen.
         // 2. We will unite (join) all the factors that contain H.
         // 3. We will eliminate the variable of H from the unified factor that we received.
         while (!hidden_list.isEmpty()) {
@@ -541,6 +539,11 @@ public class Network {
      * If there is a tie for the minimum number of lines, it selects
      * the pair with the lowest sum of ASCII values for the variables in the difference
      * between the two factor's variables
+     *
+     * @param factors
+     * @param index_factor
+     * @param query_var_to_Join
+     * @return
      */
     private List<Integer> findJoin(List<Factor> factors, List<Integer> index_factor, List<String> query_var_to_Join) {
         List<Integer> minIndexes = new ArrayList<>();
@@ -556,9 +559,6 @@ public class Network {
                 Variable var = this.bayesian.get(varName);
                 numLines *= var.getVar_outcome().size();
             }
-
-            // calculates the number of lines that would be added by joining factorA and factorB as
-            // the product of their sizes divided by the size of the intersecting variables.
             numLines = factorA.getSize() * factorB.getSize() / numLines;
 
             if (numLines < minNumLines) {
@@ -566,9 +566,6 @@ public class Network {
                 minIndexes.clear();
                 minIndexes.add(index_factor.get(i));
                 minIndexes.add(index_factor.get(i + 1));
-
-
-                //
             } else if (numLines == minNumLines) {
                 int sumAscii = sumAsciiValues(differences(factorA.getVarOfTheFactor(), factorB.getVarOfTheFactor(), query_var_to_Join));
 
@@ -608,11 +605,16 @@ public class Network {
     }
 
     /**
-     * In order to calculate the sum of ASCII values
+     * in order to calculate the sum of ASCII values
      * This function iterates through both listA and listB,
      * and adds elements to the diff list if they are not present in the other
      * list and are present in queryVarsToJoin. At the end, it returns the diff list.
-     * It is used to find the difference between the two lists of variables.
+     * it is used to find the difference between the two lists of variables
+     *
+     * @param listA
+     * @param listB
+     * @param queryVarsToJoin
+     * @return
      */
     private List<String> differences(List<String> listA, List<String> listB, List<String> queryVarsToJoin) {
         List<String> diff = new ArrayList<>();
@@ -646,7 +648,7 @@ public class Network {
 
 
     /**
-     * This method checks if a variable is an ancestor of query or evidence variables
+     * his method checks if a variable is an ancestor of query or evidence variables
      * using (BFS) algorithm.
      */
     private boolean isAncestor(String name, List<String> parents) {

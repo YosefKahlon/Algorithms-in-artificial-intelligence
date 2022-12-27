@@ -10,12 +10,8 @@ import java.util.*;
 
 
 /**
- *
  * ID: 209011840
- *
  */
-
-
 
 
 public class Ex1 {
@@ -74,7 +70,7 @@ public class Ex1 {
         Network bayesian = new Network(variableList);
 
         //print the network
-       // bayesian.printNetwork();
+        //bayesian.printNetwork();
 
 
         //write to the output file the result
@@ -82,28 +78,26 @@ public class Ex1 {
             FileWriter myWriter = new FileWriter(output);
 
             while (!queries.isEmpty()) {
-               // System.out.println(queries.peek());
+                // System.out.println(queries.peek());
                 String[] s1 = queries.poll().split("\\)");
                 String[] algo_num = s1[1].split(",");
                 String[] p_queries = s1[0].split("\\(");
-               // System.out.println(Arrays.toString(p_queries));
-
+                // System.out.println(Arrays.toString(p_queries));
 
 
                 switch (algo_num[1]) {
                     case ("1"):
-                       // System.out.println(bayesian.simpleInference(p_queries[1]));
+                        // System.out.println(bayesian.simpleInference(p_queries[1]));
                         myWriter.write(bayesian.simpleInference(p_queries[1]));
                         break;
                     case ("2"):
-                        myWriter.write( bayesian.VariableElimination(p_queries[1]));
-                       // System.out.println(bayesian.VariableElimination(p_queries[1]));
+                        myWriter.write(bayesian.VariableElimination(p_queries[1]));
+                        // System.out.println(bayesian.VariableElimination(p_queries[1]));
                         break;
                     case ("3"):
                         //I didn't do it
-                        myWriter.write( bayesian.VariableElimination(p_queries[1]));
+                        myWriter.write("0,0,0\n");
                 }
-
 
 
             }

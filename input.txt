@@ -1,0 +1,2 @@
+big_net.xml
+P(D1=T|A1=T,A2=F,A3=T,C1=T,C2=v1),2

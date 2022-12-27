@@ -6,7 +6,7 @@ import java.util.*;
  * When the features are:
  * 1. Name
  * 2. List of parents
- * 3. A list of outcome
+ * 3. A list of a list of values
  * 4. CPT - Table
  */
 

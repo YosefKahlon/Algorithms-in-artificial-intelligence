@@ -64,16 +64,13 @@ public class Factor {
         this.varOfTheFactor.addAll(var.getParentsName());
         this.varOfTheFactor.add(var.getName());
         this.factor.put(this.varOfTheFactor, var.getCptLines(evidence, evidence_outcome));
-       // System.out.println(this.varOfTheFactor);
+
     }
 
     /**
      * This method build a new factor over the union of the variables
      */
     public Factor join(Factor factor) {
-//        System.out.println("======================================");
-//        System.out.println("this.factor: " + this.varOfTheFactor);
-//        System.out.println("other factor :" + factor.varOfTheFactor);
 
         Factor result = new Factor();
         Map<List<String>, Double> probability = new HashMap<>();
@@ -122,7 +119,7 @@ public class Factor {
 
                 //   System.out.println(varIndex);
                 for(int k : varIndex.keySet()){
-
+                    //   System.out.println(k);
                     // System.out.println(a.get(k));
                     // System.out.println(b.get(varIndex.get(k)));
                     if (!a.get(k).equals(b.get(varIndex.get(k)))) {
@@ -148,8 +145,6 @@ public class Factor {
             }
 
         }
-
-        //save the counters
         result.setParameter(resultFactorVar, probability);
         add_Multi(multi_counter);
         add_Multi(factor.getMulti_counter());

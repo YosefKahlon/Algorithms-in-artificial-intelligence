@@ -1,0 +1,7 @@
+net4.xml
+P(D=F|G=fine),1
+P(D=F|G=fine),2
+P(S=T|L=F,G=high),1
+P(S=T|L=F,G=high),2
+P(G=low|L=F,S=T),1
+P(G=low|L=F,S=T),2

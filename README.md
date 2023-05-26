@@ -28,16 +28,15 @@ The project includes two algorithms for performing inference in Bayesian network
 # Input File Format
 The input file should follow a specific format. It consists of:
 
-* The first line: The path to an XML file containing the Bayesian network structure.
-* Subsequent lines: Queries to be answered by the Bayesian network.
+* The first line: The name of the XML file that represents the Bayesian network.
+* Subsequent lines: Queries to be answered by the Bayesian network and the number of algorithms to be used for inference on the given query .
+
 Example input.txt file:
 
 <div dir='ltr'>
 
-    Copy code
-    network.xml
-    P(B|A=true)
-    P(C|B=true)
+    big_net.xml
+    P(D1=T|A1=T,A2=F,A3=T,C1=T,C2=v1),2
 </div>
 
 # Code Structure
@@ -55,11 +54,11 @@ The project consists of several Java classes:
 3. The program will perform inference queries using the Bayesian network and write the results to the output file.
 
 # Output
-The program will generate an output.txt file containing the results of the inference queries. Each line in the output file corresponds to a query in the input file and includes the probabilities or values calculated by the specified algorithm.
+The program will generate an output.txt file containing the results of the inference queries. Each line in the output file corresponds to a query in the input file and includes the probabilities or values calculated by the specified algorithm, along with the number of addition and multiplication operations performed.
 
 Example output.txt file:
 <div dir='ltr'>
 
-    0.471,0.529
-    0.357,0.643
+    0.39160,21,48
+  
 </div>
